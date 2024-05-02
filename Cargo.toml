@@ -1,8 +1,15 @@
 [package]
-name = "bricc"
-version = "0.1.0"
+name = "blok"
+description = "3D arrays that matter"
+authors = ["j-stach"]
+version = "0.0.0"
 edition = "2021"
+repository = "https://github.com/j-stach/blok"
+license = "MIT OR Apache-2.0"
+readme = "README.md"
+
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
-[dependencies]
+[dev-dependencies]
+anal-eyes = "0.0.1"
