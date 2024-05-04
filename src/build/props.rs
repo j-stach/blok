@@ -1,0 +1,5 @@
+
+
+pub trait Props: Clone {
+
+}

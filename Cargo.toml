@@ -13,3 +13,8 @@ readme = "README.md"
 
 [dev-dependencies]
 anal-eyes = "0.0.1"
+
+[dependencies]
+anyhow = "1.0.82"
+derive_more = "0.99.17"
+serde = { version = "1.0.200", features = ["derive"] }

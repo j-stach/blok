@@ -14,6 +14,8 @@ Needs:
 - "Alignment" for temporary collections from two rows/matrices, for connect?
 - GPU integration? Or keep it low-level
 
+derive macros
+
 Useful for:
 - Traits, could be applied elsewhere
 - Volumetric-aware 3d modeling, property-based rendering
