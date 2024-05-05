@@ -116,6 +116,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         self
     }
 
+    // TODO Supertrait?
     fn realize_voids(&'b mut self) -> &'b mut Self{
         let mut rows = self.clone_into_rows();
         let max = rows.iter()
@@ -131,7 +132,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         self
     }
 
-    fn fill_voids(&'b mut self, constructor: B::Constructor) {
+    fn fill_voids(&mut self, constructor: B::Constructor) {
         for block in self.blocks_mut().iter_mut() {
             if block.is_void() {
                 *block = constructor()
@@ -139,7 +140,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         }
     }
 
-    fn fill_with_clones(&'b mut self, block: B) {
+    fn fill_with_clones(&mut self, block: B) {
         for b in self.blocks_mut().iter_mut() {
             if b.is_void() {
                 *b = block.clone()
@@ -147,27 +148,25 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         }
     }
 
-    fn collapse_voids(&'b mut self) {
+    fn collapse_voids(&mut self) {
         let mut rows = self.clone_into_rows();
         rows = rows.into_iter().map(|r| r.into_iter().filter(|b| !b.is_void()).collect()).collect();
         self.set_from_rows(rows)
     }
 
     /// Flip the layer across the Y axis, reversing the sequence of rows.
-    fn flip_x(&'b mut self) -> &'b mut Self {
+    fn flip_x(&mut self) {
         let rows = self.clone_into_rows().into_iter().rev().collect();
         self.set_from_rows(rows);
-        self
     }
 
     /// Flip the layer across the X axis, reversing the order of assemblies within the rows.
-    fn flip_y(&'b mut self) -> &'b mut Self {
+    fn flip_y(&mut self) {
         let rows = self.clone_into_rows()
             .into_iter()
             .map(|v| v.into_iter().rev().collect())
             .collect();
         self.set_from_rows(rows);
-        self
     }
 
     // TODO pub fn rotate_90(&mut self) -> &mut Self { todo!{}}
@@ -175,15 +174,14 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
     // TODO pub fn rotate_270(&mut self) -> &mut Self { todo!{}}
 
     /// Adds the other layer's rows to this layer.
-    fn stitch_x(&mut self, mut other: Self) -> &mut Self {
+    fn stitch_x(&'b mut self, mut other: Self) {
         self.layout_mut().append(other.layout_mut());
         self.blocks_mut().append(other.blocks_mut());
-        self
     }
 
     /// Appends each row with the corresponding row from the other layer.
     // TODO Describe mismatched size behavior
-    fn stitch_y(&mut self, other: Self) -> &mut Self {
+    fn stitch_y(&'b mut self, other: Self) {
         let mut s1 = self.clone_into_rows();
         let mut s2 = other.clone_into_rows();
 
@@ -204,22 +202,21 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         }
 
         self.set_from_rows(s1);
-        self
     }
 
 
     /// Splits a layer into two at the given row number.
-    fn split_x(&mut self, split: usize) -> (&mut Self, Self) {
+    fn split_x(&mut self, split: usize) -> Self {
         let mut original = self.clone_into_rows();
         let mut new = Self::new();
         let remainder = original.split_off(split);
         self.set_from_rows(original);
         new.set_from_rows(remainder);
-        (self, new)
+        new
     }
 
     /// Splits a structure into two by splitting each row at index given.
-    fn split_y(&mut self, split: usize) -> (&mut Self, Self) {
+    fn split_y(&mut self, split: usize) -> Self {
         let mut original = self.clone_into_rows();
         let mut remainder = Vec::new();
         for row in original.iter_mut() {
@@ -230,12 +227,22 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         self.set_from_rows(original);
         let mut new = Self::new();
         new.set_from_rows(remainder);
-        (self, new)
+        new
     }
 
-    // TODO Layout booleans
 
-    // TODO Mirror, with a clone, flip & stitch
+    fn mirror_x(&'b mut self) {
+        let mut reflection = self.clone();
+        reflection.flip_x();
+        self.stitch_x(reflection);
+    }
+
+    fn mirror_y(&'b mut self) {
+        let mut reflection = self.clone();
+        reflection.flip_y();
+        self.stitch_y(reflection);
+    }
+
 
     // TODO riffle x/y
 

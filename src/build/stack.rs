@@ -25,6 +25,7 @@ pub trait Stack<'b, B: Block<'b>, L: Layer<'b, B> + 'b> {
     }
 
     // TODO realize_voids, fill_voids, clones
+    // "apply_all", with return tuple?
 
     // TODO layer fusions & transforms on stack level
     // TODO riffle x/y/z
