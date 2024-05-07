@@ -24,10 +24,25 @@ pub trait Stack<'b, B: Block<'b>, L: Layer<'b, B> + 'b> {
         self.layers_mut().push(layer)
     }
 
-    // TODO realize_voids, fill_voids, clones
-    // "apply_all", with return tuple?
+    fn insert(&mut self, index: usize, layer: L) {
+        self.layers_mut().insert(index, layer);
+    }
 
-    // TODO layer fusions & transforms on stack level
-    // TODO riffle x/y/z
+    // TODO OFFSET
+
+    // TODO realize_voids, fill_voids, clones
+    fn realize_voids(&'b mut self) -> &'b mut Self {
+        // get the max dims x and y for the layers,
+        // add voids to fill in
+        todo![]
+    }
+    // TODO FILL VOIDS, FILL CLONES
+    // COLLAPSE (COMPRESS, WITH GRAVITY)
+    // COMPRESS VOIDS
+
+    // TODO STITCH FLIP SPLIT MIRROR
+    // TODO RIFFLE x/y/z
+
+    // TODO FUSIONS vs MERGE
 
 }

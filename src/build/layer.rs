@@ -116,6 +116,8 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         self
     }
 
+    // TODO OFFSET
+
     // TODO Supertrait?
     fn realize_voids(&'b mut self) -> &'b mut Self{
         let mut rows = self.clone_into_rows();
@@ -148,7 +150,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         }
     }
 
-    fn collapse_voids(&mut self) {
+    fn remove_voids(&mut self) {
         let mut rows = self.clone_into_rows();
         rows = rows.into_iter().map(|r| r.into_iter().filter(|b| !b.is_void()).collect()).collect();
         self.set_from_rows(rows)
@@ -205,7 +207,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
     }
 
 
-    /// Splits a layer into two at the given row number.
+    /// Splits a layer into two at the given row number. Leaves the original in place.
     fn split_x(&mut self, split: usize) -> Self {
         let mut original = self.clone_into_rows();
         let mut new = Self::new();
@@ -231,12 +233,14 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
     }
 
 
+    /// Stitches an x-flipped clone (after this layer's existing rows).
     fn mirror_x(&'b mut self) {
         let mut reflection = self.clone();
         reflection.flip_x();
         self.stitch_x(reflection);
     }
 
+    /// Stitches a y-flipped clone (to the ends of this layer's rows).
     fn mirror_y(&'b mut self) {
         let mut reflection = self.clone();
         reflection.flip_y();
@@ -244,7 +248,35 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
     }
 
 
-    // TODO riffle x/y
+    /// Merges the other layer into this one, by alternating rows.
+    /// New layer will begin with a row originally from self.
+    fn riffle_x(&'b mut self, other: &'b mut Self) {
+        let rows = self.clone_into_rows();
+        let other = other.clone_into_rows();
+        let riffled: Vec<Vec<B>> = rows.into_iter()
+            .zip(other.into_iter())
+            .flat_map(|(r, o)| vec![r, o])
+            .collect();
+        self.set_from_rows(riffled);
+    }
+
+    /// Merges with the other layer, by alternating indices for corresponding rows.
+    /// New layer's rows will begin with blocks originally from self.
+    fn riffle_y(&'b mut self, other: &'b mut Self) {
+        let rows = self.clone_into_rows();
+        let other = other.clone_into_rows();
+        let riffled: Vec<Vec<B>> = rows.into_iter()
+            .zip(other.into_iter())
+            .map(|(r, o)| {
+                let r: Vec<B> = r.into_iter()
+                    .zip(o.into_iter())
+                    .flat_map(|(rr, oo)| vec![rr, oo])
+                    .collect();
+                r
+            })
+            .collect();
+        self.set_from_rows(riffled);
+    }
 
     // merge, fuse, transmute, ditto
 
