@@ -1,7 +1,7 @@
 
-use crate::{ Block, Layout };
+use crate::{ Block, Props, Layout };
 
-pub trait Layer<'b, B: Block<'b>>: Clone {
+pub trait Layer<'b, P: Props, B: Block<'b, P>>: Clone {
     fn new() -> Self;
     fn build(&mut self) -> Result<Self, impl std::error::Error>;
 
@@ -53,13 +53,13 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         }
     }
 
-    fn add_block(&'b mut self, block: B) {
+    fn add_block(& mut self, block: B) {
         self.blocks_mut().push(block);
         if self.layout().len() == 0 { self.new_row() }
         *self.layout_mut().last_mut().unwrap() += 1;
     }
 
-    fn add_to_row(&'b mut self, row: usize, block: B) -> Result<&'b mut Self, anyhow::Error> {
+    fn add_to_row(& mut self, row: usize, block: B) -> Result<& mut Self, anyhow::Error> {
         if self.layout().len() < row {
             let index = {
                 let mut index = 0usize;
@@ -74,7 +74,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         } else { Err(anyhow::anyhow!("Row {} could not be indexed", row))}
     }
 
-    fn insert_block(&'b mut self, row: usize, index: usize, block: B) -> Result<&'b mut Self, anyhow::Error> {
+    fn insert_block(& mut self, row: usize, index: usize, block: B) -> Result<& mut Self, anyhow::Error> {
         let row_max = self.layout().len();
         if row_max > row && row_max > 0  {
             let index = {
@@ -97,7 +97,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
 
     }
 
-    fn populate(&'b mut self, mut layout: Layout, constructor: B::Constructor) -> &'b mut Self {
+    fn populate(& mut self, mut layout: Layout, constructor: B::Constructor) -> & mut Self {
         for row in layout.iter() {
             for _ in 0..*row {
                 self.blocks_mut().push(constructor())
@@ -107,7 +107,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         self
     }
 
-    fn populate_with_clones(&'b mut self, mut layout: Layout, block: &B) -> &'b mut Self {
+    fn populate_with_clones(& mut self, mut layout: Layout, block: &B) -> & mut Self {
         for row in layout.iter() {
             for _ in 0..*row {
                 self.blocks_mut().push(block.clone());
@@ -120,7 +120,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
     // TODO OFFSET
 
     // TODO Supertrait?
-    fn realize_voids(&'b mut self) -> &'b mut Self{
+    fn realize_voids(& mut self) -> & mut Self{
         let mut rows = self.clone_into_rows();
         let max = rows.iter()
             .map(|r| r.len())
@@ -177,14 +177,14 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
     // TODO pub fn rotate_270(&mut self) -> &mut Self { todo!{}}
 
     /// Adds the other layer's rows to this layer.
-    fn stitch_x(&'b mut self, mut other: Self) {
+    fn stitch_x(& mut self, mut other: Self) {
         self.layout_mut().append(other.layout_mut());
         self.blocks_mut().append(other.blocks_mut());
     }
 
     /// Appends each row with the corresponding row from the other layer.
     // TODO Describe mismatched size behavior
-    fn stitch_y(&'b mut self, other: Self) {
+    fn stitch_y(& mut self, other: Self) {
         let mut s1 = self.clone_into_rows();
         let mut s2 = other.clone_into_rows();
 
@@ -235,14 +235,14 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
 
 
     /// Stitches an x-flipped clone (after this layer's existing rows).
-    fn mirror_x(&'b mut self) {
+    fn mirror_x(& mut self) {
         let mut reflection = self.clone();
         reflection.flip_x();
         self.stitch_x(reflection);
     }
 
     /// Stitches a y-flipped clone (to the ends of this layer's rows).
-    fn mirror_y(&'b mut self) {
+    fn mirror_y(& mut self) {
         let mut reflection = self.clone();
         reflection.flip_y();
         self.stitch_y(reflection);
@@ -251,7 +251,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
 
     /// Merges the other layer into this one, by alternating rows.
     /// New layer will begin with a row originally from self.
-    fn riffle_x(&'b mut self, other: &'b mut Self) {
+    fn riffle_x(&mut self, other: & mut Self) {
         let rows = self.clone_into_rows();
         let other = other.clone_into_rows();
         let riffled: Vec<Vec<B>> = rows.into_iter()
@@ -263,7 +263,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
 
     /// Merges with the other layer, by alternating indices for corresponding rows.
     /// New layer's rows will begin with blocks originally from self.
-    fn riffle_y(&'b mut self, other: &'b mut Self) {
+    fn riffle_y(& mut self, other: & mut Self) {
         let rows = self.clone_into_rows();
         let other = other.clone_into_rows();
         let riffled: Vec<Vec<B>> = rows.into_iter()

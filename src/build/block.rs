@@ -49,4 +49,12 @@ pub trait Block<'b, P: Props>: Clone {
         other.overwrite(self.clone());
         self.overwrite(shelf);
     }
+
+    /// Swaps this block with another block if the other is a void.
+    fn shift(&mut self, other: &mut Self) -> Option<()> {
+        match other.is_void() {
+            true => { Some(self.swap(other)) },
+            false => None
+        }
+    }
 }
