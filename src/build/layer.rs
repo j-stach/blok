@@ -3,6 +3,7 @@ use crate::{ Block, Layout };
 
 pub trait Layer<'b, B: Block<'b>>: Clone {
     fn new() -> Self;
+    fn build(&mut self) -> Result<Self, impl std::error::Error>;
 
     fn blocks(&self) -> &Vec<B>;
     fn blocks_mut(&mut self) -> &mut Vec<B>;
@@ -134,7 +135,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         self
     }
 
-    fn fill_voids(&mut self, constructor: B::Constructor) {
+    fn fill_voids(&mut self, constructor: &B::Constructor) {
         for block in self.blocks_mut().iter_mut() {
             if block.is_void() {
                 *block = constructor()
@@ -142,7 +143,7 @@ pub trait Layer<'b, B: Block<'b>>: Clone {
         }
     }
 
-    fn fill_with_clones(&mut self, block: B) {
+    fn fill_with_clones(&mut self, block: &B) {
         for b in self.blocks_mut().iter_mut() {
             if b.is_void() {
                 *b = block.clone()

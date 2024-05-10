@@ -28,7 +28,7 @@ pub trait Stack<'b, B: Block<'b>, L: Layer<'b, B> + 'b> {
         self.layers_mut().insert(index, layer);
     }
 
-    // TODO OFFSET
+    // TODO OFFSET xyz
 
     // TODO realize_voids, fill_voids, clones
     fn realize_voids(&'b mut self) -> &'b mut Self {
@@ -36,9 +36,39 @@ pub trait Stack<'b, B: Block<'b>, L: Layer<'b, B> + 'b> {
         // add voids to fill in
         todo![]
     }
-    // TODO FILL VOIDS, FILL CLONES
-    // COLLAPSE (COMPRESS, WITH GRAVITY)
+
+    fn fill_voids(&mut self, constructor: &B::Constructor) {
+        for layer in self.layers_mut() {
+            layer.fill_voids(&constructor)
+        }
+    }
+
+    fn fill_with_clones(&mut self, block: &B) {
+        for layer in self.layers_mut() {
+            layer.fill_with_clones(block)
+        }
+    }
+
+
     // COMPRESS VOIDS
+    fn compress(&'b mut self) -> &'b mut Self {
+        for layer in self.layers_mut() {
+            layer.remove_voids()
+        }
+        self
+    }
+
+    // COLLAPSE (COMPRESS, WITH GRAVITY)
+    fn collapse(&'b mut self) -> &'b mut Self {
+        // realize voids
+        // for each layer, starting with the last, except for the first,
+        // for each non-void block, if the layer below has a void block or no block in that row/index,
+        // check the index/row of the layer below that, and so on, until one is found,
+        // move the block to the empty layer/row/index above it & continue
+        // NOTE: Do not remove voids, let collapse and compress be functionally separate
+
+        todo![]
+    }
 
     // TODO STITCH FLIP SPLIT MIRROR
     // TODO RIFFLE x/y/z

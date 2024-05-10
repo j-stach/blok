@@ -11,5 +11,5 @@ pub trait Block<'b>: Clone {
     fn properties(&self) -> Option<Self::Props>;
 
 
-    // functions to merge, move, replace properties, and trait for properties
+    // functions to connect, merge, move, replace properties, and trait for properties
 }
