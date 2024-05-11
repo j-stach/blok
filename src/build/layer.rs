@@ -119,8 +119,9 @@ pub trait Layer<'b, P: Props, B: Block<'b, P>>: Clone {
 
     // TODO OFFSET
 
+
     // TODO Supertrait?
-    fn realize_voids(& mut self) -> & mut Self{
+    fn realize_voids(&mut self) -> &mut Self{
         let mut rows = self.clone_into_rows();
         let max = rows.iter()
             .map(|r| r.len())
@@ -130,6 +131,20 @@ pub trait Layer<'b, P: Props, B: Block<'b, P>>: Clone {
             while r.len() < max {
                 r.push(B::void());
             }
+        }
+        self.set_from_rows(rows);
+        self
+    }
+
+    fn realize_volume(&mut self, x: usize, y: usize) -> &mut Self {
+        let mut rows = self.clone_into_rows();
+        for r in rows.iter_mut() {
+            while r.len() < y {
+                r.push(B::void());
+            }
+        }
+        while rows.len() < x {
+            rows.push(vec![B::void(); y])
         }
         self.set_from_rows(rows);
         self

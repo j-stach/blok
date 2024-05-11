@@ -40,12 +40,30 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
         self.layers_mut().insert(index, layer);
     }
 
+    fn clone_into_blocks(&mut self) -> Vec<Vec<Vec<B>>> {
+        todo![]
+    }
+
     ///
     // TODO OFFSET xyz
-    fn realize_voids(&'b mut self) -> &'b mut Self {
-        // get the max dims x and y for the layers,
-        // add voids to fill in
-        todo![]
+
+    ///
+    fn realize_voids(&mut self) -> &mut Self {
+        let mut max_x = 0usize;
+        let mut max_y = 0usize;
+        for layer in self.layers().iter() {
+            let row_count = layer.layout().len();
+            let max_index = layer.layout().iter().max();
+            if row_count > max_x { max_x = row_count }
+            if let Some(index) = max_index {
+                if index > &max_y { max_y = *index }
+            }
+        }
+
+        for layer in self.layers_mut().iter_mut() {
+            layer.realize_volume(max_x, max_y);
+        }
+        self
     }
 
     ///
@@ -72,9 +90,20 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
     }
 
     /// Removes voids by dropping "unsupported" blocks down from higher layers.
-    fn collapse(&'b mut self) -> &'b mut Self {
-        // realize voids
-        // for each layer, starting with the last, except for the first,
+    fn collapse(&mut self) -> &mut Self {
+        self.realize_voids();
+        //let mut layers = self.clone_into_blocks();
+        //assert!{layers.len() > 0, "A stack needs layers to use `Stack::collapse`"};
+
+        // for each row in each layer
+        // for each non-void block, shift down to the lower layer
+        // if any shifted mark true
+        // repeat for each layer
+        // if true, collapse again
+
+        // need "vertical" vectors transform
+
+
         // for each non-void block, if the layer below has a void block or no block in that row/index,
         // check the index/row of the layer below that, and so on, until one is found,
         // move the block to the empty layer/row/index above it & continue
@@ -84,20 +113,21 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
     }
 
     ///
-    fn split_x(&mut self) -> Self {
-        // new stack
-        // for each layer, split x and push to new stack
-        // return new stack
-        todo![]
+    fn split_x(&mut self, split: usize) -> Self {
+        let mut new = Self::new();
+        for layer in self.layers_mut().iter_mut() {
+            new.layers_mut().push(layer.split_x(split))
+        }
+        new
     }
 
     ///
-    fn split_y(&mut self) -> Self {
-        // new stack
-        // for each layer, split y and push to new stack
-        // return new stack
-        todo![]
-
+    fn split_y(&mut self, split: usize) -> Self {
+        let mut new = Self::new();
+        for layer in self.layers_mut().iter_mut() {
+            new.layers_mut().push(layer.split_y(split))
+        }
+        new
     }
 
     ///
@@ -110,12 +140,18 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
 
     ///
     fn flip_x(&mut self) {
-        // flip each layer in place
+        let mut these = self.layers().clone();
+        these.iter_mut()
+            .for_each(|s| s.flip_x() );
+        *self.layers_mut() = these
     }
 
     ///
     fn flip_y(&mut self) {
-        // flip each layer in place
+        let mut these = self.layers().clone();
+        these.iter_mut()
+            .for_each(|s| s.flip_y() );
+        *self.layers_mut() = these
     }
 
     /// Reverses the order of stack layers.
@@ -126,14 +162,22 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
 
     ///
     fn stitch_x(&mut self, other: &mut Self) {
-        // for each corresponding layer
-        // zip & stitch_x
+        let mut these = self.layers().clone();
+        let those = other.layers().clone();
+        these.iter_mut()
+            .zip(those.into_iter())
+            .for_each(|(s, o)| s.stitch_x(o) );
+        *self.layers_mut() = these
     }
 
     ///
     fn stitch_y(&mut self, other: &mut Self) {
-        // for each corresponding layer
-        // zip & stitch_x
+        let mut these = self.layers().clone();
+        let those = other.layers().clone();
+        these.iter_mut()
+            .zip(those.into_iter())
+            .for_each(|(s, o)| s.stitch_y(o) );
+        *self.layers_mut() = these
     }
 
     /// Stack the entire other stack atop this stack's layers.
@@ -164,20 +208,22 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
 
     ///
     fn riffle_x(&mut self, other: &mut Self) {
-        let these = self.layers().clone();
+        let mut these = self.layers().clone();
         let those = other.layers().clone();
-        these.into_iter()
+        these.iter_mut()
             .zip(those.into_iter())
-            .for_each(|(mut s, mut o)| s.riffle_x(&mut o) )
+            .for_each(|(s, mut o)| s.riffle_x(&mut o) );
+        *self.layers_mut() = these
     }
 
     ///
     fn riffle_y(&mut self, other: &mut Self) {
-        let these = self.layers().clone();
+        let mut these = self.layers().clone();
         let those = other.layers().clone();
-        these.into_iter()
+        these.iter_mut()
             .zip(those.into_iter())
-            .for_each(|(mut s, mut o)| s.riffle_y(&mut o) )
+            .for_each(|(s, mut o)| s.riffle_y(&mut o) );
+        *self.layers_mut() = these
     }
 
     ///
@@ -188,7 +234,7 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
             .zip(those.into_iter())
             .flat_map(|(r, o)| vec![r, o])
             .collect();
-        *self.layers_mut() = riffled;
+        *self.layers_mut() = riffled
     }
 
 
