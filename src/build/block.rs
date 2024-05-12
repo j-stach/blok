@@ -2,7 +2,7 @@
 use crate::Props;
 
 /// The fundamental structure element for Blok.
-pub trait Block<'b, P: Props>: Clone {
+pub trait Block<P: Props>: Clone {
     // TODO A lot of these are boilerplate; look into making a derive macro soon.
 
     /// Specify the block generator function type.

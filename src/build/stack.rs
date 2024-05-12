@@ -1,7 +1,7 @@
 
 use crate::{ Block, Props, Layer };
 
-pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
+pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     ///
     fn new() -> Self;
 
@@ -11,18 +11,26 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
     fn layers_mut(&mut self) -> &mut Vec<L>;
 
     ///
-    fn get_layer(&'b self, layer: usize) -> Option<&'b L> {
+    fn get_layer(&self, layer: usize) -> Option<&L> {
         self.layers().get(layer)
     }
 
     ///
-    fn get_layer_mut(&mut self, layer: usize) -> Option<&mut L> {
-        self.layers_mut().get_mut(layer)
+    fn get_layer_mut(&mut self, layer: usize) -> Result<&mut L, anyhow::Error> {
+        self.layers_mut().get_mut(layer).ok_or(anyhow::anyhow!("Invalid layer index"))
     }
 
     ///
-    fn get_block(&'b self, layer: usize, row: usize, index: usize) -> Option<&B> {
-        self.get_layer(layer)?.get_block(row, index)
+    fn get_block<'stack>(
+        &'stack self,
+        layer: usize,
+        row: usize,
+        index: usize
+    ) -> Result<&'stack B, anyhow::Error>
+        where L: 'stack
+    {
+        let layer = self.get_layer(layer).ok_or(anyhow::anyhow!("Invalid layer index"))?;
+        layer.get_block(row, index).ok_or(anyhow::anyhow!("Invalid block index"))
     }
 
     ///
@@ -82,7 +90,7 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
 
 
     /// Removes voids by layer while preserving non-void block count and ordering.
-    fn compress(&'b mut self) -> &'b mut Self {
+    fn compress(&mut self) -> &mut Self {
         for layer in self.layers_mut() {
             layer.remove_voids()
         }
@@ -166,7 +174,7 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
         let those = other.layers().clone();
         these.iter_mut()
             .zip(those.into_iter())
-            .for_each(|(s, o)| s.stitch_x(o) );
+            .for_each(|(s, mut o)| s.stitch_x(&mut o) );
         *self.layers_mut() = these
     }
 
@@ -176,7 +184,7 @@ pub trait Stack<'b, P: Props, B: Block<'b, P>, L: Layer<'b, P, B> + 'b>: Clone {
         let those = other.layers().clone();
         these.iter_mut()
             .zip(those.into_iter())
-            .for_each(|(s, o)| s.stitch_y(o) );
+            .for_each(|(s, mut o)| s.stitch_y(&mut o) );
         *self.layers_mut() = these
     }
 
