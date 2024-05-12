@@ -1,17 +1,37 @@
 
-## blok
+# blok development
+## TODO:
 
-Builder crate:
-Create a simple crate with traits for this kind of alignment and building,
-then implement them for cajal structure builders.
-Needs:
-- "Connect" trait for associating elements
-- GPU integration? Or keep it low-level
+Additional crates:
+[ ] `blok-derive` with macros for blok traits
+[ ] `blok-tui` for using blok with `ratatui`?
+[ ] `blok-engine` for game design & dev
 
-
-derive macros
-
-Useful for:
-- Traits, could be applied elsewhere
+Readme:
 - Volumetric-aware 3d modeling, property-based rendering
-- proc-gen of maps for station x
+- TUI apps through `blok-tui`
+- Games through `blok-engine`
+- How to download
+- How to use blocks, layers, and stack (brief example, see examples folder)
+
+Examples:
+[ ] How to implement blok traits for custom types
+[ ] How to recursively implement blok traits (ie, how to use a stack as a block)
+
+Tests:
+[ ] Unit tests per trait
+
+Stack & Layer:
+[ ] Overlap, align and merge,
+[ ] Offsetting procedures
+[ ] Collapse function for stack
+[ ] Docs & comments
+
+Layout:
+[ ] More methods and helpers for Layout?
+
+Block & Props:
+[ ] ??
+
+Connect:
+[ ] Connection traits extending build type traits?
