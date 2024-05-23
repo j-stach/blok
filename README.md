@@ -12,10 +12,34 @@ by using "connections" to procedurally link their properties.
 ```
 $ cargo add blok
 ```
-2. Define a `Block` type. This is the element/particle type for the matrix.
+
+2. Define a `Block` type and its associated `Props` type.
+This is the element/particle for the matrix.
 ```
-// TODO Copy example
+use blok::build::{ Props, Block };
+
+#[derive(Clone)]
+struct MyProps;
+impl Props for MyProps {
+    fn merge(&mut self, other: &mut Self) {
+        // Combine the values however you like.
+    }
+}
+
+#[derive(Clone)]
+struct MyBlock {
+    props: Option<MyProps>
+}
+// TODO: Boilerplate, we can derive this later:
+impl Block<MyProps> for MyBlock {
+    type Constructor = fn() -> MyBlock;
+    fn properties(&self) -> &Option<MyProps> { &self.props }
+    fn properties_mut(&mut self) -> &mut Option<MyProps> { &mut self.props }
+    fn void() -> MyBlock { MyBlock { props: None }}
+    fn is_void(&self) -> bool { self.properties().is_none() }
+}
 ```
+
 3. Define a `Layer` type for holding blocks in a 2-D array.
 ```
 // Layers are organized with the layout stored separately from the collection of blocks.

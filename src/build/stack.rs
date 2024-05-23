@@ -44,6 +44,11 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     }
 
     ///
+    fn stack_all(&mut self, layers: Vec<L>) {
+        for layer in layers { self.stack(layer) }
+    }
+
+    ///
     fn insert(&mut self, index: usize, layer: L) {
         self.layers_mut().insert(index, layer);
     }
@@ -247,5 +252,9 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
 
 
     // TODO FUSIONS vs MERGE overlap
+
+    fn align_center(&mut self) {
+        // TODO for each layer, determine the center of mass
+    }
 
 }

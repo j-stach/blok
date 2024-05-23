@@ -4,7 +4,7 @@ use serde::{ Serialize, Deserialize };
 
 
 #[derive(Deref, DerefMut, Debug, Clone, Serialize, Deserialize)]
-pub struct Layout(Vec<usize>);
+pub struct Layout(pub Vec<usize>);
 impl Layout {
     pub fn new() -> Self { Self(Vec::new()) }
 
@@ -41,7 +41,8 @@ impl FromIterator<usize> for Layout {
 
 #[macro_export] macro_rules! layout {
     () => { Layout::new() };
-    ($($elem:expr),+ $(,)?) => {{ Layout(vec![$($elem),+]) }}
+    ($($elem:expr),+ $(,)?) => {{ Layout(vec![$($elem),+]) }};
+    ($elem:expr; $count:expr) => {{ Layout(vec![$elem; $count]) }};
 }
 
 

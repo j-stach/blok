@@ -7,7 +7,8 @@ pub trait Block<P: Props>: Clone {
 
     /// Specify the block generator function type.
     /// For convenience, define a custom type using a fn pointer.
-    type Constructor: Fn() -> Self;
+    // TODO BuildArgs type will be added to this constructor!!
+    type Constructor: Fn() -> Self; // TODO: Needs "A" arg instructions generic
 
     /// Define how properties are read from the block.
     /// For convenience, store in a field rather than a new, separate representation.
@@ -18,10 +19,13 @@ pub trait Block<P: Props>: Clone {
 
     /// Define the constructor for a block that represents empty space.
     fn void() -> Self;
-    /// Define the check for a void block.
-    fn is_void(&self) -> bool;
-    /// Removes the block's properties (data) while perserving its structural effect.
-    fn to_void(&mut self) { *self = Self::void() }
+
+    /// Checks if the block is void (has no properties).
+    fn is_void(&self) -> bool { self.properties().is_none() }
+    /// Removes the block's properties (data) while perserving its other values.
+    fn to_void(&mut self) { *self.properties_mut() = None }
+    /// Replaces the block with a default void, overwriting all other values.
+    fn to_new_void(&mut self) { *self = Self::void() }
 
     /// Merge the properties of another block into this one.
     // TODO overload + for merge?

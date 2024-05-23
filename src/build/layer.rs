@@ -6,8 +6,6 @@ use crate::{ Block, Props, Layout };
 pub trait Layer<P: Props, B: Block<P>>: Clone {
     /// Define a constructor for the empty layer.
     fn new() -> Self;
-    /// Define a function to finalize the layer blocks' properties.
-    fn build(&mut self) -> Result<Self, impl std::error::Error>;
 
     /// Define a method for accessing the blocks of a layer type.
     fn blocks(&self) -> &Vec<B>;
@@ -18,9 +16,6 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
     fn layout(&self) -> &Layout;
     /// Define a method for mutably accessing the layout of a layer type.
     fn layout_mut(&mut self) -> &mut Layout;
-
-    /// Add an empty row to the layer.
-    fn new_row(&mut self) { self.layout_mut().push(0) }
 
     /// Get the span of blocks representing the given row number.
     fn get_row(&self, row: usize) -> Option<&[B]> {
@@ -55,6 +50,15 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
     fn set_from_blocks(&mut self, blocks: Vec<Vec<B>>) {
         *self.layout_mut() = blocks.iter().map(|v| v.len()).collect();
         *self.blocks_mut() = blocks.into_iter().flatten().collect();
+    }
+
+    /// Add an empty row to the layer.
+    fn new_row(&mut self) { self.layout_mut().push(0) }
+
+    /// Add a collection of blocks as a new row.
+    fn add_row(&mut self, mut collection: Vec<B>) {
+        self.layout_mut().push(collection.len());
+        self.blocks_mut().append(&mut collection)
     }
 
     /// Insert a collection of blocks as a new row at the given index.
@@ -143,8 +147,15 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
         self
     }
 
+    ///
+    fn offset_x(&mut self, offset: usize) {
 
-    // TODO OFFSET
+    }
+
+    ///
+    fn offset_y(&mut self, offset: usize) {
+
+    }
 
     /// Squares off the matrix to the highest row length,
     /// by inserting void blocks into the empty indices.
