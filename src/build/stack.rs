@@ -1,9 +1,9 @@
 
-use crate::{ Block, Props, Layer, Layout };
+use crate::{ Block, Layer, Layout };
 
 // TODO set_layer offset_xyz collapse fusion/merge_overlap
 
-pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
+pub trait Stack<B: Block>: Clone {
     ///
     fn new() -> Self;
 
@@ -13,13 +13,13 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     fn blocks_mut(&mut self) -> &mut Vec<B>;
 
     ///
-    fn clone_into_layers(&self) -> Vec<L> {
+    fn clone_into_layers(&self) -> Vec<Layer<B>> {
         let mut layers = Vec::new();
         let mut blocks = self.blocks().clone();
         for layout in self.layouts().iter() {
             let t = layout.total();
             let rest = blocks.split_off(t);
-            let mut layer = L::new();
+            let mut layer = Layer::new();
             layer.set_from_layout(layout.clone(), blocks);
             blocks = rest;
             layers.push(layer)
@@ -28,7 +28,7 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     }
 
     ///
-    fn set_from_layers(&mut self, layers: Vec<L>) {
+    fn set_from_layers(&mut self, layers: Vec<Layer<B>>) {
         *self.layouts_mut() = layers.iter().map(|l| l.layout().clone()).collect();
         *self.blocks_mut() = layers.iter().flat_map(|l| l.blocks().clone()).collect();
     }
@@ -47,7 +47,7 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     fn set_from_blocks(&mut self, blocks: Vec<Vec<Vec<B>>>) {
         let mut layers = Vec::new();
         for bs in blocks.iter() {
-            let mut layer = L::new();
+            let mut layer = Layer::new();
             layer.set_from_blocks(bs.to_owned());
             layers.push(layer)
         }
@@ -55,14 +55,14 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     }
 
     ///
-    fn clone_layer(&self, l: usize) -> Option<L> {
+    fn clone_layer(&self, l: usize) -> Option<Layer<B>> {
         let layouts = self.layouts();
         if l > layouts.len() { return None }
         let start = self.find_layer_start(l)?;
         let layout = &layouts[l];
         let end = start + layout.total();
 
-        let mut layer = L::new();
+        let mut layer = Layer::new();
         layer.set_from_layout(layout.clone(), self.blocks()[start..end].to_vec());
         Some(layer)
     }
@@ -105,18 +105,18 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     }
 
     ///
-    fn stack(&mut self, mut layer: L) {
+    fn stack(&mut self, mut layer: Layer<B>) {
         self.layouts_mut().push(layer.layout().clone());
         self.blocks_mut().append(&mut layer.blocks_mut());
     }
 
     ///
-    fn stack_all(&mut self, layers: Vec<L>) {
+    fn stack_all(&mut self, layers: Vec<Layer<B>>) {
         for layer in layers { self.stack(layer) }
     }
 
     ///
-    fn insert(&mut self, index: usize, layer: L) {
+    fn insert(&mut self, index: usize, layer: Layer<B>) {
         let mut layers = self.clone_into_layers();
         layers.insert(index, layer);
         self.set_from_layers(layers)
@@ -327,7 +327,7 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     fn riffle_z(&mut self, other: &mut Self) {
         let these = self.clone_into_layers();
         let those = other.clone_into_layers();
-        let riffled: Vec<L> = these.into_iter()
+        let riffled: Vec<Layer<B>> = these.into_iter()
             .zip(those.into_iter())
             .flat_map(|(r, o)| vec![r, o])
             .collect();

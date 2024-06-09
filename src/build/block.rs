@@ -1,8 +1,6 @@
 
-use crate::Props;
-
 /// The fundamental structure element for Blok.
-pub trait Block<P: Props>: Clone {
+pub trait Block: Clone {
     // TODO A lot of these are boilerplate; look into making a derive macro soon.
 
     /// Specify the block generator function type.
@@ -10,39 +8,15 @@ pub trait Block<P: Props>: Clone {
     // TODO BuildArgs type will be added to this constructor!!
     type Constructor: Fn() -> Self; // TODO: Needs "A" arg instructions generic
 
-    /// Define how properties are read from the block.
-    /// For convenience, store in a field rather than a new, separate representation.
-    fn properties(&self) -> &Option<P>;
-    /// Define how properties are mutably read from the block.
-    /// For convenience, store in a field rather than a new, separate representation.
-    fn properties_mut(&mut self) -> &mut Option<P>;
-
     /// Define the constructor for a block that represents empty space.
     fn void() -> Self;
 
     /// Checks if the block is void (has no properties).
-    fn is_void(&self) -> bool { self.properties().is_none() }
+    fn is_void(&self) -> bool;
     /// Removes the block's properties (data) while perserving its other values.
-    fn to_void(&mut self) { *self.properties_mut() = None }
+    fn to_void(&mut self);
     /// Replaces the block with a default void, overwriting all other values.
     fn to_new_void(&mut self) { *self = Self::void() }
-
-    /// Merge the properties of another block into this one.
-    // TODO overload + for merge?
-    fn merge(&mut self, other: &mut Self) {
-        if self.properties().is_some() && other.properties().is_some() {
-            let other_props = other.properties_mut().as_mut().unwrap();
-            self.properties_mut().as_mut().unwrap().merge(other_props)
-        } else if other.properties().is_some() {
-            let other_props = other.properties_mut().as_mut().unwrap();
-            self.transmute(other_props)
-        }
-    }
-
-    /// Change the block's properties to some new value(s).
-    fn transmute(&mut self, new_properties: &P) {
-        *self.properties_mut() = Some(new_properties.clone())
-    }
 
     /// Overwrite the entire block with new data.
     fn overwrite(&mut self, other: Self) { *self = other }
