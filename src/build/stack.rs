@@ -1,23 +1,67 @@
 
-use crate::{ Block, Props, Layer };
+use crate::{ Block, Props, Layer, Layout };
+
+// TODO: Modify to include a vector of bloks and a vector of layouts, instead of a vector of layers
 
 pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
     ///
     fn new() -> Self;
 
-    ///
-    fn layers(&self) -> &Vec<L>;
-    ///
-    fn layers_mut(&mut self) -> &mut Vec<L>;
+    fn layouts(&self) -> &Vec<Layout>;
+    fn layouts_mut(&mut self) -> &mut Vec<Layout>;
+    fn blocks(&self) -> &Vec<B>;
+    fn blocks_mut(&mut self) -> &mut Vec<B>;
 
     ///
-    fn get_layer(&self, layer: usize) -> Option<&L> {
-        self.layers().get(layer)
+    fn clone_into_layers(&self) -> Vec<L> {
+        let mut layers = Vec::new();
+        let mut blocks: std::collections::VecDeque<B> = self.blocks().clone_into();
+        for l in self.layouts().iter() {
+            let t = l.total();
+            layers.push(L::new().set_from_layout(l, blocks.pop_front(t).into()))
+        }
+        layers
     }
 
     ///
-    fn get_layer_mut(&mut self, layer: usize) -> Result<&mut L, anyhow::Error> {
-        self.layers_mut().get_mut(layer).ok_or(anyhow::anyhow!("Invalid layer index"))
+    fn set_from_layers(&mut self, layers: Vec<L>) {
+        *self.layouts_mut() = layers.iter().map(|l| l.layout().clone()).collect();
+        *self.blocks_mut() = layers.iter().map(|l| l.blocks().clone()).collect();
+    }
+
+    ///
+    fn clone_into_blocks(&self) -> Vec<Vec<Vec<B>>> {
+        let layers = self.clone_into_layers();
+        let mut blocks = Vec::new();
+        for l in layers.into_iter() {
+            blocks.push(l.clone_into_blocks())
+        }
+        blocks
+    }
+
+    ///
+    fn set_from_blocks(&mut self, blocks: Vec<Vec<Vec<B>>>) {
+        let mut layers = Vec::new();
+        for l in blocks.iter() {
+            let mut layer = L::new();
+            layers.push(layer.set_from_blocks(l))
+        }
+        self.set_from_layers(layers);
+    }
+
+    ///
+    fn get_layer(&self, l: usize) -> Option<&L> {
+        let layouts = self.layouts();
+        if l > layouts.len() { return None }
+        let mut start = 0usize;
+        for layout in layouts.iter()[0..l] {
+            start += layout.total()
+        }
+        let layout = layouts[l];
+        let end = start + layout.total();
+
+        let layer = L::new().set_from_layout(layout, self.blocks()[start..end].to_vec());
+        Some(layer)
     }
 
     ///
@@ -35,12 +79,13 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
 
     ///
     fn new_layer(&mut self) {
-        self.layers_mut().push(L::new())
+        self.layouts_mut().push(Layout::new())
     }
 
     ///
     fn stack(&mut self, layer: L) {
-        self.layers_mut().push(layer)
+        self.layouts_mut().push(*layer.layout());
+        self.blocks_mut().push(*layer.blocks());
     }
 
     ///
@@ -50,21 +95,17 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
 
     ///
     fn insert(&mut self, index: usize, layer: L) {
-        self.layers_mut().insert(index, layer);
+        self.set_from_layers(self.clone_into_layers().insert(index, layer))
     }
 
-    fn clone_into_blocks(&mut self) -> Vec<Vec<Vec<B>>> {
-        todo![]
-    }
-
-    ///
     // TODO OFFSET xyz
 
     ///
     fn realize_voids(&mut self) -> &mut Self {
         let mut max_x = 0usize;
         let mut max_y = 0usize;
-        for layer in self.layers().iter() {
+        let mut layers = self.clone_into_layers();
+        for layer in layers.iter() {
             let row_count = layer.layout().len();
             let max_index = layer.layout().iter().max();
             if row_count > max_x { max_x = row_count }
@@ -73,32 +114,39 @@ pub trait Stack<P: Props, B: Block<P>, L: Layer<P, B>>: Clone {
             }
         }
 
-        for layer in self.layers_mut().iter_mut() {
+        for layer in layers.iter_mut() {
             layer.realize_volume(max_x, max_y);
         }
+        self.set_from_layers(layers);
         self
     }
 
     ///
     fn fill_voids(&mut self, constructor: &B::Constructor) {
-        for layer in self.layers_mut() {
+        let layers = self.clone_into_layers();
+        for layer in layers {
             layer.fill_voids(&constructor)
         }
+        self.set_from_layers(layers)
     }
 
     ///
     fn fill_with_clones(&mut self, block: &B) {
-        for layer in self.layers_mut() {
+        let layers = self.clone_into_layers();
+        for layer in layers {
             layer.fill_with_clones(block)
         }
+        self.set_from_layers(layers)
     }
 
 
     /// Removes voids by layer while preserving non-void block count and ordering.
     fn compress(&mut self) -> &mut Self {
-        for layer in self.layers_mut() {
+        let layers = self.clone_into_layers();
+        for layer in layers {
             layer.remove_voids()
         }
+        self.set_from_layers(layers);
         self
     }
 

@@ -1,6 +1,6 @@
 
 use crate::build::props::Props;
 
-pub trait PropsConnect {
-
+pub trait PropsConnect: Props {
+    type PropsConnector;
 }

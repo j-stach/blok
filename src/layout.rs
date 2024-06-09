@@ -10,6 +10,7 @@ impl Layout {
 
     pub fn wrap(vec: Vec<usize>) -> Self { Layout(vec) }
 
+    // TBD "set_total" ? And have the total be a field, for easy access
     pub fn total(&self) -> usize {
         let mut total = 0usize;
         for e in self.iter() { total += e }

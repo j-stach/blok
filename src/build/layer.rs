@@ -17,6 +17,15 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
     /// Define a method for mutably accessing the layout of a layer type.
     fn layout_mut(&mut self) -> &mut Layout;
 
+    // TODO Make Result type?
+    /// Set the layer to the provided layout and blocks.
+    /// WARNING: Panics if the layout total and number of blocks do not match.
+    fn set_from_layout(&mut self, layout: Layout, blocks: Vec<B>) {
+        assert_eq!(layout.total(), blocks.len());
+        self.layout = layout;
+        self.blocks = blocks;
+    }
+
     /// Get the span of blocks representing the given row number.
     fn get_row(&self, row: usize) -> Option<&[B]> {
         let layout = self.layout();

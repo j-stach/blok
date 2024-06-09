@@ -101,27 +101,13 @@ fn main() {
     pyramid.insert(1, layer2);
     pyramid.stack(layer4);
 
-    // Pyramid layers are misaligned, so let's center it manually by using offsets.
+    // Pyramid layers are misaligned, so let's center it using offsets.
     let mut count = 0usize;
     for layer in pyramid.layers_mut().iter_mut() {
         layer.offset_x(count);
         layer.offset_y(count);
         count += 1
     }
-
-    /* TODO:
-    // That's convenient for our pyramid, but complicated for less regular shapes.
-    // There are a few simple auto-alignments for Stack that can get you started.
-    // Here, we can stick with a central alignment.
-
-    // First, we reset our pyramid by removing the voids we added to offset:
-    // This calls `Layer::remove_voids()` for each Layer.
-    pyramid.compress();
-
-    // This determines the "center of mass" for each layer, in both X and Y dimensions,
-    // then automatically adjusts each layer so that the COM for all layers are aligned.
-    pyramid.align_center();
-    */
 
     // And that's a pyramid! Have fun trying to pretty-print it!
     // Next up in example 2, learn how to connect blocks using procedural generation.
