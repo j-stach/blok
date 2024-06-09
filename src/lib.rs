@@ -4,8 +4,8 @@ pub use build::{
     Props, Block, Layer, Stack
 };
 
-pub mod connect;
-pub use connect::*;
+//pub mod connect;
+//pub use connect::*;
 
 pub mod layout;
 pub use layout::*;

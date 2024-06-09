@@ -22,8 +22,8 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
     /// WARNING: Panics if the layout total and number of blocks do not match.
     fn set_from_layout(&mut self, layout: Layout, blocks: Vec<B>) {
         assert_eq!(layout.total(), blocks.len());
-        self.layout = layout;
-        self.blocks = blocks;
+        *self.layout_mut() = layout;
+        *self.blocks_mut() = blocks;
     }
 
     /// Get the span of blocks representing the given row number.
@@ -129,7 +129,6 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
             self.layout_mut()[row] += 1;
             Ok(self)
         } else { Err(anyhow::anyhow!("Row {} could not be indexed", row))}
-
     }
 
     /// Creates blocks using the given constructor,
@@ -158,12 +157,14 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
 
     ///
     fn offset_x(&mut self, offset: usize) {
-
+        // TODO
+        todo!{}
     }
 
     ///
     fn offset_y(&mut self, offset: usize) {
-
+        // TODO
+        todo!{}
     }
 
     /// Squares off the matrix to the highest row length,
@@ -274,7 +275,6 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
         self.set_from_blocks(s1);
     }
 
-
     /// Splits a layer into two at the given row number. Leaves the original in place.
     fn split_x(&mut self, split: usize) -> Self {
         let mut original = self.clone_into_blocks();
@@ -300,7 +300,6 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
         new
     }
 
-
     /// Stitches an x-flipped clone (after this layer's existing rows).
     fn mirror_x(&mut self) {
         let mut reflection = self.clone();
@@ -314,7 +313,6 @@ pub trait Layer<P: Props, B: Block<P>>: Clone {
         reflection.flip_y();
         self.stitch_y(&mut reflection);
     }
-
 
     /// Merges the other layer into this one, by alternating rows.
     /// New layer will begin with a row originally from self.
