@@ -1,7 +1,7 @@
 
 pub mod build;
 pub use build::{
-    Props, Block, Layer, Stack
+    Block, Layer, Stack
 };
 
 //pub mod connect;
