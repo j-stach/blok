@@ -10,13 +10,13 @@ pub trait Block: Clone {
 
     /// Define the constructor for a block that represents empty space.
     fn void() -> Self;
-
     /// Checks if the block is void (has no properties).
     fn is_void(&self) -> bool;
-    /// Removes the block's properties (data) while perserving its other values.
-    fn to_void(&mut self);
     /// Replaces the block with a default void, overwriting all other values.
-    fn to_new_void(&mut self) { *self = Self::void() }
+    fn to_void(&mut self) { *self = Self::void() }
+
+    type ConnectionInstructions: Clone;
+    fn connect(&mut self, other: &mut Self, instructions: &Self::ConnectionInstructions);
 
     /// Overwrite the entire block with new data.
     fn overwrite(&mut self, other: Self) { *self = other }
