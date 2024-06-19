@@ -4,6 +4,7 @@ use crate::layout::Layout;
 use crate::align::{ Alignment, Aligner };
 
 
+/// Connect two rows of blocks according to the parameters given.
 pub fn row_connection<B: Block>(row1: &mut Vec<B>, row2: &mut Vec<B>, alignment: Alignment, instructions: Vec<B::ConnectionInstructions>) {
     // TODO if instructions are incomplete for alignment, fill it in
     assert_eq!(alignment.len(), instructions.len());
@@ -18,6 +19,7 @@ pub fn row_connection<B: Block>(row1: &mut Vec<B>, row2: &mut Vec<B>, alignment:
     }
 }
 
+/// Connect two layers using row_connection.
 pub fn interconnect_layers<B: Block>(layer1: &mut Layer<B>, layer2: &mut Layer<B>, r1: usize, r2: usize, align: Aligner<B>, instructions: Vec<B::ConnectionInstructions>) {
     if layer1.layout().len() <= r1 || layer2.layout().len() <= r2 { panic!("Could not index row... Errors not yet implemented") }
     let mut rows1 = layer1.clone_into_blocks();
@@ -30,6 +32,7 @@ pub fn interconnect_layers<B: Block>(layer1: &mut Layer<B>, layer2: &mut Layer<B
     layer2.set_from_blocks(rows2);
 }
 
+/// Connect two layers for each pair of corresponding rows.
 pub fn interconnect_corresponding_rows<B: Block>(layer1: &mut Layer<B>, layer2: &mut Layer<B>, align: Aligner<B>, instructions: Vec<B::ConnectionInstructions>) {
     let (l1, l2) = (layer1.layout().len(), layer2.layout().len());
     let max = if l1 > l2 {l1} else {l2};
@@ -38,11 +41,12 @@ pub fn interconnect_corresponding_rows<B: Block>(layer1: &mut Layer<B>, layer2: 
     }
 }
 
+/// Connect two layers for each pair of corresponding blocks in each pair of corresponding rows.
 pub fn interconnect_corresponding_blocks<B: Block>(layer1: &mut Layer<B>, layer2: &mut Layer<B>, instructions: Vec<B::ConnectionInstructions>) {
     interconnect_corresponding_rows(layer1, layer2, Alignment::corresponding, instructions)
 }
 
-
+/// Connect two stacks using layer_connection.
 pub fn interconnect_stacks<B: Block, S: Stack<B>>(stack1: &mut S, stack2: &mut S, l1: usize, l2: usize, r1: usize, r2: usize, align: Aligner<B>, instructions: Vec<B::ConnectionInstructions>) {
     if stack1.layouts().len() <= l1 || stack2.layouts().len() <= l2 { panic!("Could not index layer... Errors not yet implemented") }
     let mut layers1 = stack1.clone_into_layers();

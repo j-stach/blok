@@ -3,7 +3,7 @@
 
 use blok::{
     Layout, layout,
-    build::{ Props, Block, Layer, Stack },
+    build::{ Block, Layer, Stack },
 };
 
 

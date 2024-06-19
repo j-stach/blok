@@ -14,14 +14,3 @@ pub mod align;
 pub use align::{ Alignment, Aligner };
 
 
-/*
- Notes on use cases:
- volume & material-aware modeling & rendering
- connections for game physics
- matrix for game room, "objects" can be represented as collections
- of arranged properties that move between blocks
- */
-
-
-
-

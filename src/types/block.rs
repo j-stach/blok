@@ -1,4 +1,5 @@
 
+
 /// The fundamental structure element for Blok.
 pub trait Block: Clone {
     // TODO A lot of these are boilerplate; look into making a derive macro soon.
@@ -15,7 +16,9 @@ pub trait Block: Clone {
     /// Replaces the block with a default void, overwriting all other values.
     fn to_void(&mut self) { *self = Self::void() }
 
+    /// Define the argument type for connecting blocks.
     type ConnectionInstructions: Clone;
+    /// Define the process for connecting blocks.
     fn connect(&mut self, other: &mut Self, instructions: &Self::ConnectionInstructions);
 
     /// Overwrite the entire block with new data.
