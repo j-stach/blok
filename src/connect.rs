@@ -1,6 +1,5 @@
 
 use crate::types::{ Block, Layer, Stack };
-use crate::layout::Layout;
 use crate::align::{ Alignment, Aligner };
 
 
@@ -51,8 +50,8 @@ pub fn interconnect_stacks<B: Block, S: Stack<B>>(stack1: &mut S, stack2: &mut S
     if stack1.layouts().len() <= l1 || stack2.layouts().len() <= l2 { panic!("Could not index layer... Errors not yet implemented") }
     let mut layers1 = stack1.clone_into_layers();
     let mut layers2 = stack2.clone_into_layers();
-    let mut layer1 = &mut layers1[l1];
-    let mut layer2 = &mut layers2[l2];
+    let layer1 = &mut layers1[l1];
+    let layer2 = &mut layers2[l2];
     interconnect_layers(layer1, layer2, r1, r2, align, instructions);
     stack1.set_from_layers(layers1);
     stack2.set_from_layers(layers2);

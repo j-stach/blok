@@ -2,7 +2,6 @@
 use derive_more::{ Deref, DerefMut };
 
 use crate::Block;
-use crate::layout::Layout;
 
 
 /// Function for generating an Alignment from two rows.
@@ -38,7 +37,7 @@ impl Alignment {
         let mut vec = Vec::new();
 
         for i in 0..max { vec.push((0+i, r2-i)) }
-        Self::max(vec)
+        Self::wrap(vec)
     }
 
     /// Align a random block from the first row to a random block in the second.
@@ -57,7 +56,7 @@ impl Alignment {
 
         let mut vec = Vec::new();
         for i in 0..max { vec.push((vec1[i], vec2[i])) }
-        Self::max(vec)
+        Self::wrap(vec)
     }
 
     /// Align each block in one row to each block in the other.
@@ -67,7 +66,7 @@ impl Alignment {
         let mut vec = Vec::new();
 
         for _1 in 0..r1 { for _2 in 0..r2 { vec.push((_1, _2)) }}
-        Self::max(vec)
+        Self::wrap(vec)
     }
 
     /// Centers the elignment as much as possible.
