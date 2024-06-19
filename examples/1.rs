@@ -6,16 +6,6 @@ use blok::{
     build::{ Props, Block, Layer, Stack },
 };
 
-/// Props type holds the Block values that are relevant to the overall structure.
-/// These don't have to be stored directly in the Block, but if they are created
-/// independently, they should be able to set changes to the Block via reference.
-#[derive(Clone)]
-struct MyProps;
-impl Props for MyProps {
-    /// Combine the inner values however you like. MyProps has none in this case.
-    fn merge(&mut self, _other: &mut Self) {}
-    // TODO set props
-}
 
 /// Block is the element type for the matrix.
 #[derive(Clone)]
@@ -32,28 +22,6 @@ impl Block<MyProps> for MyBlock {
     fn properties(&self) -> &Option<MyProps> { &self.props }
     fn properties_mut(&mut self) -> &mut Option<MyProps> { &mut self.props }
     fn void() -> MyBlock { MyBlock { props: None }}
-}
-
-/// Layer is a 2-D matrix of Blocks.
-#[derive(Clone)]
-struct MyLayer {
-    /// Layout is a vector of row lengths recording the shape of the matrix.
-    layout: Layout,
-    /// Blok assumes you want to keep all of a Layer's Blocks continuous in memory.
-    blocks: Vec<MyBlock>
-}
-impl Layer<MyProps, MyBlock> for MyLayer {
-    fn new() -> MyLayer {
-        MyLayer {
-            layout: Layout::new(),
-            blocks: Vec::new()
-        }
-    }
-    // Boilerplate. Derive soon.
-    fn layout(&self) -> &Layout { &self.layout }
-    fn layout_mut(&mut self) -> &mut Layout { &mut self.layout }
-    fn blocks(&self) -> &Vec<MyBlock> { &self.blocks }
-    fn blocks_mut(&mut self) -> &mut Vec<MyBlock> { &mut self.blocks }
 }
 
 /// Stack is an array of Layers, therefore a 3-D matrix of Blocks.
