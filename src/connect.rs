@@ -66,3 +66,19 @@ pub fn interconnect_stacks<B: Block, S: Stack<B>>(stack1: &mut S, stack2: &mut S
 //}
 
 // TODO fn autoconnect_layers_stepwise / uniformly
+
+// TODO Refine this to be more flexible.
+pub fn autoconnect_stack_uniformly<B: Block, S: Stack<B>>(stack: &mut S, align: Aligner<B>, instructions: Vec<B::ConnectionInstructions>) {
+    let layers = stack.clone_into_layers();
+    let mut connected = Vec::new();
+
+    let mut current = layers[0].clone();
+    for l in 1..layers.len() - 1 {
+        let mut next = layers[l].clone();
+        interconnect_corresponding_rows(&mut current, &mut next, align, instructions.clone());
+        connected.push(current);
+        current = next
+    }
+
+    stack.set_from_layers(connected)
+}

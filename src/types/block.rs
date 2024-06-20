@@ -7,7 +7,8 @@ pub trait Block: Clone {
     /// Specify the block generator function type.
     /// For convenience, define a custom type using a fn pointer.
     // TODO BuildArgs type will be added to this constructor!!
-    type Constructor: Fn() -> Self; // TODO: Needs "A" arg instructions generic
+    type ConstructionInstructions;
+    type Constructor: Fn(&Self::ConstructionInstructions) -> Self; // TODO: Needs "A" arg instructions generic
 
     /// Define the constructor for a block that represents empty space.
     fn void() -> Self;

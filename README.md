@@ -11,10 +11,14 @@ by using "connections" to procedurally link their properties.
 ```
 $ cargo add blok
 ```
+```
+use blok::{ Block, Stack, Layout, layout, Alignment, connect::* };
+```
 
 2. Define a `Block` type. This is the element/particle for the matrix.
 ```
 /// Simple implementation of a Block type.
+#[derive(Clone)]
 struct MyBlock {
     /// Data for block.
     data: String,
@@ -62,6 +66,7 @@ impl Block for MyBlock {
 3. Define a `Stack` type (a 3-D array of Blocks).
 ```
 /// Stack type represents a matrix of Blocks.
+#[derive(Clone)]
 struct MyStack {
     /// Stores the shape of the matrix as vectors of layer row lengths.
     layouts: Vec<Layout>,
@@ -104,21 +109,7 @@ fn main() {
 
 5. Connect the Stack to make its Blocks aware of one another.
 ```
-    ...
-
-    let mut layers = pyramid.clone_into_layers();
-    for l in 0..layers.len() - 1 {
-        connect::interconnect_corresponding_rows(
-            &mut layers[l],
-            &mut layers[l+1],
-            Alignment::dense,
-            vec![(); 10]
-        ) // TODO Clean this up, interconnects still need to handle incomplete instructions, etc.
-    }
-
-    pyramid.set_from_layers(layers);
-    // Do something with the pyramid.
-} // main
+TODO
 ```
 
 ## Future directions
