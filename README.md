@@ -3,7 +3,8 @@
 
 ![Blok logo](https://github.com/j-stach/blok/blob/main/media/blok_logo1_white.png)
 
-Traits for graphlike 3D arrays. (Work in progress.)
+Traits for graphlike 3D arrays. (Work in progress.) <br>
+[Documentation](https://docs.rs/blok/latest/blok/)
 
 ## How it works
 Blok can be used to build arrays of "blocks".
