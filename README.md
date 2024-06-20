@@ -1,6 +1,8 @@
 
-# blok (WIP)
-Traits for 3D arrays with attachments.
+
+
+![Blok logo](https://github.com/j-stach/blok/blob/main/blok_logo1.white.png?raw=true)
+Traits for graphlike 3D arrays. (Work in progress.)
 
 ## How it works
 Blok can be used to build arrays of "blocks".
