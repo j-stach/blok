@@ -1,7 +1,8 @@
 
 
 
-![Blok logo](https://github.com/j-stach/blok/blob/main/blok_logo1.white.png)
+![Blok logo](https://github.com/j-stach/blok/blob/main/media/blok_logo1_white.png)
+
 Traits for graphlike 3D arrays. (Work in progress.)
 
 ## How it works
