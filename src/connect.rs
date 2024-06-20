@@ -2,6 +2,8 @@
 use crate::types::{ Block, Layer, Stack };
 use crate::align::{ Alignment, Aligner };
 
+// TODO autoconnect, or a "Connectable" trait for row/layer/stack?
+
 
 /// Connect two rows of blocks according to the parameters given.
 pub fn row_connection<B: Block>(row1: &mut Vec<B>, row2: &mut Vec<B>, alignment: Alignment, instructions: Vec<B::ConnectionInstructions>) {
@@ -63,3 +65,4 @@ pub fn interconnect_stacks<B: Block, S: Stack<B>>(stack1: &mut S, stack2: &mut S
 //
 //}
 
+// TODO fn autoconnect_layers_stepwise / uniformly
