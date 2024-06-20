@@ -24,20 +24,20 @@ struct MyBlock {
     data: String,
     /// Store "connections" as a collection of data from other blocks.
     connections: Vec<String>
+} impl MyBlock {
+    /// How u maek blok.
+    fn new(data: &String) -> Self {
+        MyBlock { data: data.to_owned(), connections: Vec::new() }
+    }
 }
 impl Block for MyBlock {
 
     /// Encapsulate any arguments for the constructor into a single type.
     type ConstructionInstructions = String;
     /// Boilerplate, sorry.
-    type Constructor = fn(Self::ConstructionInstructions) -> Self;
+    type Constructor = fn(&String) -> Self;
     /// Encapsulate any arguments for the connector into a single type.
     type ConnectionInstructions = ();
-
-    /// How u maek blok.
-    fn new(data: Self::ConstructionInstructions) -> Self {
-        MyBlock { data, connections: Vec::new() }
-    }
 
     /// Define the constructor for a non-data "void" block (placeholders & spacers).
     fn void() -> Self {
@@ -49,18 +49,17 @@ impl Block for MyBlock {
 
     /// Define the test to check for "void" blocks (placeholders & spacers).
     fn is_void(&self) -> bool {
-        match &self.data {
+        match self.data.as_str() {
             "" => true,
             _ => false
         }
     }
 
     /// Define the block-to-block connection procedure.
-    fn connect(&mut self, other: &mut Self, _instr: ()) {
-        self.connections.push(other.data)
+    fn connect(&mut self, other: &mut Self, _instr: &()) {
+        self.connections.push(other.data.clone())
     }
 }
-
 ```
 
 3. Define a `Stack` type (a 3-D array of Blocks).
@@ -82,8 +81,8 @@ impl Stack<MyBlock> for MyStack {
     // Boilerplate. "Derive" macro TBD.
     fn layouts(&self) -> &Vec<Layout> { &self.layouts }
     fn layouts_mut(&mut self) -> &mut Vec<Layout> { &mut self.layouts }
-    fn blocks(&self) -> &Vec<Block> { &self.blocks }
-    fn blocks_mut(&mut self) -> &mut Vec<Block> { &mut self.blocks }
+    fn blocks(&self) -> &Vec<MyBlock> { &self.blocks }
+    fn blocks_mut(&mut self) -> &mut Vec<MyBlock> { &mut self.blocks }
 }
 ```
 
@@ -92,15 +91,15 @@ impl Stack<MyBlock> for MyStack {
 fn main() {
     let mut pyramid = MyStack::new();
     let mut bottom = Layer::new();
-    bottom.populate_with_clones(layout![3; 3], MyBlock::new("bottom"));
+    bottom.populate_with_clones(layout![3; 3], &MyBlock::new(&"bottom".to_string()));
     pyramid.stack(bottom);
 
     let mut middle = Layer::new();
-    middle.populate_with_clones(layout![2; 2], MyBlock::new("middle"));
+    middle.populate_with_clones(layout![2; 2], &MyBlock::new(&"middle".to_string()));
     pyramid.stack(middle);
 
     let mut top = Layer::new();
-    top.add_block(MyBlock::new("top"));
+    top.add_block(MyBlock::new(&"top".to_string()));
     pyramid.stack(top);
 
     ...
@@ -109,7 +108,12 @@ fn main() {
 
 5. Connect the Stack to make its Blocks aware of one another.
 ```
-TODO
+    ...
+
+    connect::autoconnect_stack_uniformly(&mut pyramid, Alignment::dense, vec![(); 10]);
+
+    // Do something with the connected pyramid.
+}
 ```
 
 ## Future directions
