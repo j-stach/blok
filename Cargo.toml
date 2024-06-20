@@ -2,7 +2,7 @@
 name = "blok"
 description = "3D arrays that matter"
 authors = ["j-stach"]
-version = "0.0.0"
+version = "0.0.1"
 edition = "2021"
 repository = "https://github.com/j-stach/blok"
 license = "MIT OR Apache-2.0"
