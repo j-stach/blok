@@ -74,8 +74,6 @@ pub trait Stack<B: Block>: Clone {
         Some(layer)
     }
 
-    // TODO set_layer
-
     /// Find the block index for the start of the layer.
     fn find_layer_start(&self, l: usize) -> Option<usize> {
         let layouts = self.layouts();
@@ -345,5 +343,4 @@ pub trait Stack<B: Block>: Clone {
         self.set_from_layers(riffled)
     }
 
-    // TODO FUSIONS vs MERGE overlap
 }

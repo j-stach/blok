@@ -3,18 +3,21 @@ use derive_more::{ Deref, DerefMut };
 use serde::{ Serialize, Deserialize };
 
 
-/// Represents the "shape" of the array for easy indexing.
+/// Represents the "shape" of the array layer for easy indexing.
 #[derive(Deref, DerefMut, Debug, Clone, Serialize, Deserialize)]
 pub struct Layout(pub Vec<usize>);
 
 impl Layout {
     /// Create a default (empty) layout.
-    pub fn new() -> Self { Self(Vec::new()) }
+    pub fn new() -> Self { 
+        Self(Vec::new()) 
+    }
 
     /// Create a Layout from a Vec<usize>.
-    pub fn wrap(vec: Vec<usize>) -> Self { Layout(vec) }
+    pub fn wrap(vec: Vec<usize>) -> Self { 
+        Layout(vec) 
+    }
 
-    // TBD "set_total" ? And have the total be a field, for easy access
     /// Count the number of blocks represented by the layout.
     pub fn total(&self) -> usize {
         let mut total = 0usize;
