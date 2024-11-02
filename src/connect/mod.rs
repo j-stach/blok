@@ -1,6 +1,8 @@
 
+pub mod align;
+pub use align::{ Alignment, Aligner };
+
 use crate::types::{ Block, Layer, Stack };
-use crate::align::{ Alignment, Aligner };
 
 // TODO autoconnect, or a "Connectable" trait for row/layer/stack?
 
