@@ -4,10 +4,10 @@
 pub trait Block: Clone {
 
     /// Define the argument struct for creating a block.
-    type CreationInstructions: Clone;
+    type CreationInstructions: Clone + Default;
     
     /// Define the argument struct for connecting blocks.
-    type ConnectionInstructions: Clone;
+    type ConnectionInstructions: Clone + Default;
 
     /// Define the process for constructing a new block.
     fn create(instructions: Self::CreationInstructions) -> Self;

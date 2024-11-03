@@ -1,5 +1,5 @@
 
-/* Example to show basic usage and features */
+/* Example to show basic usage */
 
 use blok::{ Block, Stack, Layer, Layout, layout, Alignment, connect };
 

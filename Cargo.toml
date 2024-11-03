@@ -1,3 +1,4 @@
+
 [package]
 name = "blok"
 description = "3D arrays that matter"
@@ -9,14 +10,17 @@ license = "MIT OR Apache-2.0"
 readme = "README.md"
 
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
-[dev-dependencies]
-anal-eyes = "0.0.1"
-
 [dependencies]
 anyhow = "1.0.82"
 derive_more = "0.99.17"
 rand = "0.8.5"
 serde = { version = "1.0.200", features = ["derive"] }
+
+
+[dev-dependencies]
+anal-eyes = "0.0.1"
+
+[[test]]
+name = "block_test"
+path = "test/block.rs"
 

@@ -34,6 +34,7 @@ TBD More procedural patterns & alignments as needed:
 
 ## connect 
 ### connect/align.rs 
+- [ ] alignment macro to reduce boilerplate in definition
 
 
 
