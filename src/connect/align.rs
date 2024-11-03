@@ -1,11 +1,9 @@
 
 use derive_more::{ Deref, DerefMut };
 
-use crate::Block;
 
-
-/// Associates two rows of blocks, by index.
-/// Used for scheduling procedural ocnnection generation.
+/// Associates two rows of blocks, layers of rows, or stacks of layer, by index.
+/// Used for scheduling procedural connection generation.
 #[derive(Deref, DerefMut)]
 pub struct Alignment(Vec<(usize, usize)>);
 
@@ -17,15 +15,15 @@ impl Alignment {
 }
 
 
-/// Function type for generating an Alignment from two rows.
-pub type Aligner<B> = fn(&Vec<B>, &Vec<B>) -> Alignment;
+/// Function type for generating an Alignment.
+pub type Aligner<T> = fn(&Vec<T>, &Vec<T>) -> Alignment;
 
 /// Here are some basic Aligners. 
 /// You can also write your own, as needed.
 impl Alignment {
 
     /// Align corresponding indices.
-    pub fn corresponding<B: Block>(
+    pub fn corresponding<B>(
         row1: &Vec<B>, 
         row2: &Vec<B>
     ) -> Self {
@@ -42,8 +40,8 @@ impl Alignment {
         Self::wrap(vec)
     }
 
-    /// Align the rows end-to-end.
-    pub fn reversed<B: Block>(
+    /// Align the elements end-to-end.
+    pub fn reversed<B>(
         row1: &Vec<B>, 
         row2: &Vec<B>
     ) -> Self {
@@ -60,8 +58,8 @@ impl Alignment {
         Self::wrap(vec)
     }
 
-    /// Align a random block from the first row to a random block in the second.
-    pub fn random<B: Block>(
+    /// Align a random element from the first row to a random element in the second.
+    pub fn random<B>(
         row1: &Vec<B>, 
         row2: &Vec<B>
     ) -> Self {
@@ -91,8 +89,8 @@ impl Alignment {
         Self::wrap(vec)
     }
 
-    /// Align each block in one row to each block in the other.
-    pub fn dense<B: Block>(
+    /// Align each element in one row to each element in the other.
+    pub fn dense<B>(
         row1: &Vec<B>, 
         row2: &Vec<B>
     ) -> Self {
@@ -111,9 +109,9 @@ impl Alignment {
     }
 
     /// Centers the elignment as much as possible.
-    /// Won't be perfect when row lengths are opposite parity.
+    /// Won't be perfect when lengths are opposite parity.
     /// Follows rules for usize division (round down).
-    pub fn centered<B: Block>(
+    pub fn centered<B>(
         row1: &Vec<B>, 
         row2: &Vec<B>
     ) -> Self {
@@ -144,4 +142,7 @@ impl Alignment {
     }
 }
 
+// TODO Inter-align, interconnect modifier that is bidirectional
+// Returns an Aligner function 
+// Mirror/mutual, versus recalculate
 
