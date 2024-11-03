@@ -1,87 +1,113 @@
 
 use super::{ Block, Layer, Layout };
 
-// TODO set_layer offset_xyz collapse fusion/merge_overlap realize_volume
-
 
 /// Holds a grid layout of blocks in a single vector,
 /// with row indexing stored separately.
 pub trait Stack<B: Block>: Clone {
+    
     /// Define a constructor for the empty stack.
     fn new() -> Self;
 
-    /// Get a reference to the list of layouts for the stack layers.
+    /// Provide a reference to the list of layouts for the stack layers.
     fn layouts(&self) -> &Vec<Layout>;
-    /// Get a mutable reference to the list of layouts for the stack layers.
+
+    /// Provide a mutable reference to the list of layouts for the stack layers.
     fn layouts_mut(&mut self) -> &mut Vec<Layout>;
-    /// Get a reference to the collection of blocks in the stack.
+    
+    /// Provide a reference to the collection of blocks in the stack.
     fn blocks(&self) -> &Vec<B>;
-    /// Get a mutable reference to the collection of blocks in the stack.
+    
+    /// Provide a mutable reference to the collection of blocks in the stack.
     fn blocks_mut(&mut self) -> &mut Vec<B>;
 
     /// Clone the stack into an array of layers.
     fn clone_into_layers(&self) -> Vec<Layer<B>> {
         let mut layers = Vec::new();
         let mut blocks = self.blocks().clone();
+
         for layout in self.layouts().iter() {
             let t = layout.total();
             let rest = blocks.split_off(t);
             let mut layer = Layer::new();
-            layer.set_from_layout(layout.clone(), blocks);
+            layer.set_from_layout(layout.clone(), blocks)
+                .expect("Layout corrupted"); // TODO Error
             blocks = rest;
             layers.push(layer)
         }
+
         layers
     }
 
     /// Overwrite the stack's values from an array of layers.
     fn set_from_layers(&mut self, layers: Vec<Layer<B>>) {
-        *self.layouts_mut() = layers.iter().map(|l| l.layout().clone()).collect();
-        *self.blocks_mut() = layers.iter().flat_map(|l| l.blocks().clone()).collect();
+        *self.layouts_mut() = layers.iter()
+            .map(|layer| layer.layout().clone())
+            .collect();
+
+        *self.blocks_mut() = layers.iter()
+            .flat_map(|layer| layer.blocks().clone())
+            .collect();
     }
 
     /// Clone the stack into a matrix of blocks.
     fn clone_into_blocks(&self) -> Vec<Vec<Vec<B>>> {
         let layers = self.clone_into_layers();
         let mut blocks = Vec::new();
-        for l in layers.into_iter() {
-            blocks.push(l.clone_into_blocks())
+
+        for layer in layers.into_iter() {
+            blocks.push(layer.clone_into_blocks())
         }
+
         blocks
     }
 
     /// Overwrite the stack's values from a matrix of blocks.
     fn set_from_blocks(&mut self, blocks: Vec<Vec<Vec<B>>>) {
         let mut layers = Vec::new();
-        for bs in blocks.iter() {
+
+        for bb in blocks.iter() {
             let mut layer = Layer::new();
-            layer.set_from_blocks(bs.to_owned());
+            layer.set_from_blocks(bb.to_owned());
             layers.push(layer)
         }
+
         self.set_from_layers(layers);
     }
 
     /// Clone a layer from the stack and return it as a new entity.
     fn clone_layer(&self, l: usize) -> Option<Layer<B>> {
         let layouts = self.layouts();
-        if l > layouts.len() { return None }
-        let start = self.find_layer_start(l)?;
+        if l > layouts.len() { 
+            return None 
+        }
+
         let layout = &layouts[l];
+        let start = self.find_layer_start(l)?;
         let end = start + layout.total();
 
         let mut layer = Layer::new();
-        layer.set_from_layout(layout.clone(), self.blocks()[start..end].to_vec());
+        layer.set_from_layout(
+            layout.clone(), 
+            self.blocks()[start..end].to_vec()
+        )
+        .expect("Layout corrupted"); // TODO Error
+
         Some(layer)
     }
 
     /// Find the block index for the start of the layer.
     fn find_layer_start(&self, l: usize) -> Option<usize> {
         let layouts = self.layouts();
-        if l > layouts.len() { return None }
+        if l > layouts.len() { 
+            return None 
+        }
+
         let mut start = 0usize;
         for layout in &layouts[0..l] {
             start += layout.total()
         }
+
         Some(start)
     }
 
@@ -92,16 +118,22 @@ pub trait Stack<B: Block>: Clone {
         row: usize,
         mut index: usize
     ) -> Option<&'stack B> {
+
         let layout = &self.layouts()[layer];
         let l_start = self.find_layer_start(layer)?;
-        if row > layout.len() { return None }
+        if row > layout.len() { 
+            return None 
+        }
+
         let r_start = {
             let mut sum = 0usize;
             layout[0..row].iter().for_each(|r| sum += r);
             sum
         };
+
         if index > layout[row] { return None }
         index += l_start + r_start;
+
         Some(&self.blocks()[index])
     }
 
@@ -118,17 +150,21 @@ pub trait Stack<B: Block>: Clone {
 
     /// Add an array of pre-existing layers to the top of the stack.
     fn stack_all(&mut self, layers: Vec<Layer<B>>) {
-        for layer in layers { self.stack(layer) }
+        for layer in layers { 
+            self.stack(layer) 
+        }
     }
 
     /// Add a pre-existing layer at a specific position in the stack.
-    fn insert_layer(&mut self, index: usize, layer: Layer<B>) {
+    fn insert_layer(
+        &mut self, 
+        index: usize, 
+        layer: Layer<B>
+    ) {
         let mut layers = self.clone_into_layers();
         layers.insert(index, layer);
         self.set_from_layers(layers)
     }
-
-    // TODO OFFSET xyz
 
     /// Square off the matrix to the highest row length,
     /// by inserting void blocks into the empty indices.
@@ -136,30 +172,40 @@ pub trait Stack<B: Block>: Clone {
         let mut max_x = 0usize;
         let mut max_y = 0usize;
         let mut layers = self.clone_into_layers();
+
         for layer in layers.iter() {
+
             let row_count = layer.layout().len();
             let max_index = layer.layout().iter().max();
-            if row_count > max_x { max_x = row_count }
+            if row_count > max_x { 
+                max_x = row_count 
+            }
+
             if let Some(index) = max_index {
-                if index > &max_y { max_y = *index }
+                if index > &max_y { 
+                    max_y = *index 
+                }
             }
         }
 
         for layer in layers.iter_mut() {
             layer.realize_volume(max_x, max_y);
         }
+
         self.set_from_layers(layers);
         self
     }
 
-    // TODO realize_volume
-
     /// Replace all void blocks with ones generated by the given constructor.
-    fn fill_voids(&mut self, c: &B::Constructor, i: &B::ConstructionInstructions) {
+    fn fill_voids(
+        &mut self, 
+        instructions: &B::CreationInstructions
+    ) {
         let mut layers = self.clone_into_layers();
         for layer in layers.iter_mut() {
-            layer.fill_voids(c, i)
+            layer.fill_voids(instructions)
         }
+
         self.set_from_layers(layers)
     }
 
@@ -169,6 +215,7 @@ pub trait Stack<B: Block>: Clone {
         for layer in layers.iter_mut() {
             layer.fill_with_clones(block)
         }
+
         self.set_from_layers(layers)
     }
 
@@ -179,9 +226,12 @@ pub trait Stack<B: Block>: Clone {
         for layer in layers.iter_mut() {
             layer.remove_voids()
         }
+
         self.set_from_layers(layers);
         self
     }
+
+    /* UNDER CONSTRUCTION 
 
     /// Removes voids by dropping "unsupported" blocks down from higher layers.
     fn collapse(&mut self) -> &mut Self {
@@ -206,15 +256,19 @@ pub trait Stack<B: Block>: Clone {
 
         todo![]
     }
+*/
 
     /// Split each layer into two at the given row number. Leaves the original in place.
     fn split_x(&mut self, split: usize) -> Self {
         let mut old = self.clone_into_layers();
         let mut new = Vec::new();
+
         for layer in old.iter_mut() {
             new.push(layer.split_x(split))
         }
+
         self.set_from_layers(old);
+
         let mut stack = Self::new();
         stack.set_from_layers(new);
         stack
@@ -224,10 +278,13 @@ pub trait Stack<B: Block>: Clone {
     fn split_y(&mut self, split: usize) -> Self {
         let mut old = self.clone_into_layers();
         let mut new = Vec::new();
+
         for layer in old.iter_mut() {
             new.push(layer.split_y(split))
         }
+
         self.set_from_layers(old);
+
         let mut stack = Self::new();
         stack.set_from_layers(new);
         stack
@@ -237,7 +294,9 @@ pub trait Stack<B: Block>: Clone {
     fn split_z(&mut self, split: usize) -> Self {
         let mut old = self.clone_into_layers();
         let new = old.split_off(split);
+
         self.set_from_layers(old);
+
         let mut stack = Self::new();
         stack.set_from_layers(new);
         stack
@@ -248,6 +307,7 @@ pub trait Stack<B: Block>: Clone {
         let mut flipped = self.clone_into_layers();
         flipped.iter_mut()
             .for_each(|s| s.flip_x() );
+
         self.set_from_layers(flipped)
     }
 
@@ -256,12 +316,17 @@ pub trait Stack<B: Block>: Clone {
         let mut flipped = self.clone_into_layers();
         flipped.iter_mut()
             .for_each(|s| s.flip_y() );
+
         self.set_from_layers(flipped)
     }
 
     /// Reverses the order of stack layers.
     fn flip_z(&mut self) {
-        let flipped = self.clone_into_layers().into_iter().rev().collect();
+        let flipped = self.clone_into_layers()
+            .into_iter()
+            .rev()
+            .collect();
+
         self.set_from_layers(flipped)
     }
 
@@ -269,9 +334,11 @@ pub trait Stack<B: Block>: Clone {
     fn stitch_x(&mut self, other: &mut Self) {
         let mut these = self.clone_into_layers();
         let those = other.clone_into_layers();
+
         these.iter_mut()
             .zip(those.into_iter())
             .for_each(|(s, mut o)| s.stitch_x(&mut o) );
+
         self.set_from_layers(these)
     }
 
@@ -279,9 +346,11 @@ pub trait Stack<B: Block>: Clone {
     fn stitch_y(&mut self, other: &mut Self) {
         let mut these = self.clone_into_layers();
         let those = other.clone_into_layers();
+
         these.iter_mut()
             .zip(those.into_iter())
             .for_each(|(s, mut o)| s.stitch_y(&mut o) );
+
         self.set_from_layers(these)
     }
 
@@ -312,34 +381,43 @@ pub trait Stack<B: Block>: Clone {
         self.stitch_z(&mut mirror)
     }
 
-    /// TODO Documentation
+    /// Merge the corresponding layers of two stacks by alternating rows.
+    /// The resulting layers will begin with a row originating from "self".
     fn riffle_x(&mut self, other: &mut Self) {
         let mut these = self.clone_into_layers();
         let those = other.clone_into_layers();
+
         these.iter_mut()
             .zip(those.into_iter())
             .for_each(|(s, mut o)| s.riffle_x(&mut o) );
+
         self.set_from_layers(these)
     }
 
-    /// TODO Documentation
+    /// Merge the corresponding layers of two stacks by alternating indices for corresponding rows.
+    /// The resulting layers' rows will begin with blocks originating from "self".
     fn riffle_y(&mut self, other: &mut Self) {
         let mut these = self.clone_into_layers();
         let those = other.clone_into_layers();
+
         these.iter_mut()
             .zip(those.into_iter())
             .for_each(|(s, mut o)| s.riffle_y(&mut o) );
+
         self.set_from_layers(these)
     }
 
-    /// TODO Documentation
+    /// Merge two stacks by alternating layers.
+    /// The new stack will begin with a layer from "self".
     fn riffle_z(&mut self, other: &mut Self) {
         let these = self.clone_into_layers();
         let those = other.clone_into_layers();
+
         let riffled: Vec<Layer<B>> = these.into_iter()
             .zip(those.into_iter())
             .flat_map(|(r, o)| vec![r, o])
             .collect();
+
         self.set_from_layers(riffled)
     }
 
