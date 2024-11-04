@@ -4,7 +4,7 @@ use derive_more::{ Deref, DerefMut };
 
 /// Associates two rows of blocks, layers of rows, or stacks of layer, by index.
 /// Used for scheduling procedural connection generation.
-#[derive(Deref, DerefMut)]
+#[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct Alignment(Vec<(usize, usize)>);
 
 impl Alignment {
@@ -141,8 +141,4 @@ impl Alignment {
         Self::wrap(vec)
     }
 }
-
-// TODO Inter-align, interconnect modifier that is bidirectional
-// Returns an Aligner function 
-// Mirror/mutual, versus recalculate
 

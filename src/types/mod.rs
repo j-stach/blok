@@ -1,12 +1,11 @@
 
-pub mod block;
 pub mod layer;
 pub mod stack;
-pub mod layout;
+pub mod row;
 
 pub use self::{
-    block::Block,
+    row::Row,
     layer::Layer,
     stack::Stack,
-    layout::Layout,
 };
+

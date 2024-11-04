@@ -4,7 +4,7 @@ use serde::{ Serialize, Deserialize };
 
 
 /// Represents the "shape" of the array layer for easy indexing.
-#[derive(Deref, DerefMut, Debug, Clone, Serialize, Deserialize)]
+#[derive(Deref, DerefMut, Debug, Default, Clone, Serialize, Deserialize)]
 pub struct Layout(pub Vec<usize>);
 
 impl Layout {
