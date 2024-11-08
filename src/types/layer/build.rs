@@ -4,34 +4,6 @@ use super::*;
 /// Functions for constructing layers:
 impl<B: Block> Layer<B> {
 
-    /// Add an empty row to the layer.
-    pub fn new_row(&mut self) { 
-        self.layout_mut().push(0) 
-    }
-
-    /// Add a collection of blocks as a new row.
-    pub fn add_row(&mut self, mut collection: Vec<B>) {
-        self.layout_mut().push(collection.len());
-        self.blocks_mut().append(&mut collection)
-    }
-
-    /// Insert a collection of blocks as a new row at the given index.
-    pub fn insert_row(
-        &mut self, 
-        index: usize, 
-        collection: Vec<B>
-    ) {
-        if self.layout().len() >= index {
-            // TBD This may be unnecessary
-            self.layout_mut().insert(index, collection.len());
-            
-            let mut rows = self.clone_into_blocks();
-            rows.insert(index, collection);
-            
-            self.set_from_blocks(rows);
-        }
-    }
-
     /// Add a new block to the last row in the layer.
     pub fn add_block(&mut self, block: B) {
         self.blocks_mut().push(block);
@@ -42,8 +14,14 @@ impl<B: Block> Layer<B> {
         *self.layout_mut().last_mut().unwrap() += 1;
     }
 
+    /// Add a collection of blocks as a new row.
+    pub fn add_blocks(&mut self, mut collection: Vec<B>) {
+        self.layout_mut().push(collection.len());
+        self.blocks_mut().append(&mut collection)
+    }
+
     /// Add a block to the end of the given row.
-    pub fn add_to_row(
+    pub fn add_block_to_row(
         &mut self, 
         row: usize, 
         block: B
@@ -100,6 +78,42 @@ impl<B: Block> Layer<B> {
         }
     }
 
+    /// Insert a collection of blocks as a new row at the given index.
+    pub fn insert_blocks(
+        &mut self, 
+        index: usize, 
+        collection: Vec<B>
+    ) {
+        if self.layout().len() >= index {
+            // TBD This may be unnecessary
+            self.layout_mut().insert(index, collection.len());
+            
+            let mut rows = self.clone_into_blocks();
+            rows.insert(index, collection);
+            
+            self.set_from_blocks(rows);
+        }
+    }
+
+    /// Allocate a new row in the layer.
+    pub fn new_row(&mut self) { 
+        self.layout_mut().push(0) 
+    }
+
+    /// Add a row to the end of the layer.
+    pub fn add_row(&mut self, row: Row<B>) {
+        self.add_blocks(*row)
+    }
+
+    /// Merge a row into the layer at the given index.
+    pub fn insert_row(
+        &mut self,
+        index: usize,
+        row: Row<B>
+    ) {
+        self.insert_blocks(index, *row)
+    }
+
     /// Create blocks using the given constructor,
     /// adding them in rows according to the given layout.
     pub fn populate(
@@ -132,5 +146,23 @@ impl<B: Block> Layer<B> {
         self.layout_mut().append(&mut layout);
         self
     }
+
+    // TODO! Needs `disconnect` method for Block trait
+
+    ///// Remove the block at the given row, index.
+    //pub fn remove_block(
+    //    &mut self,
+    //    r: usize,
+    //    i: usize
+    //) -> anyhow::Result<()> {
+    //    // TODO
+    //    todo!{}
+    //}
+
+    ///// Remove the row from the given row.
+    //pub fn remove_row(&mut self, r: usize) -> anyhow::Result<()> {
+    //    // TODO
+    //    todo!{}
+    //}
 
 }

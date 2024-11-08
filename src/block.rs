@@ -10,7 +10,7 @@ pub trait Block: Clone {
     type ConnectionInstructions: Clone + Default;
 
     /// Define the process for constructing a new block.
-    fn create(instructions: Self::CreationInstructions) -> Self;
+    fn create(instructions: &Self::CreationInstructions) -> Self;
 
     /// Define the process for connecting blocks.
     fn connect(&mut self, other: &mut Self, instructions: &Self::ConnectionInstructions);
