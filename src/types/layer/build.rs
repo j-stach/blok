@@ -1,6 +1,8 @@
 
 use super::*;
 
+use crate::{ Block, Row };
+
 /// Functions for constructing layers:
 impl<B: Block> Layer<B> {
 
@@ -102,7 +104,7 @@ impl<B: Block> Layer<B> {
 
     /// Add a row to the end of the layer.
     pub fn add_row(&mut self, row: Row<B>) {
-        self.add_blocks(*row)
+        self.add_blocks(row.to_vec())
     }
 
     /// Merge a row into the layer at the given index.
@@ -111,7 +113,7 @@ impl<B: Block> Layer<B> {
         index: usize,
         row: Row<B>
     ) {
-        self.insert_blocks(index, *row)
+        self.insert_blocks(index, row.to_vec())
     }
 
     /// Create blocks using the given constructor,
@@ -123,7 +125,7 @@ impl<B: Block> Layer<B> {
     ) -> &mut Self {
         for row in layout.iter() {
             for _ in 0..*row {
-                let block = B::create(instructions.clone());
+                let block = B::create(instructions);
                 self.blocks_mut().push(block)
             }
         }

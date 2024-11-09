@@ -1,4 +1,11 @@
 
+pub mod build;
+pub mod partial;
+pub mod clone;
+//pub mod connect;
+//pub mod transform;
+//pub mod void;
+
 use derive_more::{ Deref, DerefMut };
 use crate::Block;
 

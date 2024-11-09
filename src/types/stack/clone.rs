@@ -11,7 +11,7 @@ impl<B: Block> Stack<B> {
         for layout in self.layouts().iter() {
             let t = layout.total();
             let rest = blocks.split_off(t);
-            let mut layer = Layer::new();
+            let mut layer = Layer::default();
             layer.set_from_layout(layout.clone(), blocks)
                 .expect("Layout corrupted"); // TODO Error
             blocks = rest;
@@ -53,7 +53,7 @@ impl<B: Block> Stack<B> {
         let mut layers = Vec::new();
 
         for bb in blocks.iter() {
-            let mut layer = Layer::new();
+            let mut layer = Layer::default();
             layer.set_from_blocks(bb.to_owned());
             layers.push(layer)
         }

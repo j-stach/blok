@@ -26,7 +26,7 @@ impl<B: Block> Row<B> {
         count: usize,
         instructions: &B::CreationInstructions
     ) {
-        self.append(vec![B::create(instructions); count])
+        self.append(&mut vec![B::create(instructions); count])
     }
 
     /// Create a number of blocks by cloning a prototype,
@@ -36,7 +36,7 @@ impl<B: Block> Row<B> {
         count: usize,
         block: &B
     ) {
-        self.append(vec![block.clone(); count])
+        self.append(&mut vec![block.clone(); count])
     }
 
     // TODO remove_block

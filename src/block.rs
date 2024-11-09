@@ -1,7 +1,7 @@
 
 /// Implement Block for a type in order to organize instances of that type 
 /// into Layers and Stacks.
-pub trait Block: Clone {
+pub trait Block: Clone + Default {
 
     /// Define the argument struct for creating a block.
     type CreationInstructions: Clone + Default;

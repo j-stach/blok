@@ -1,5 +1,7 @@
 
 use super::*;
+use crate::{ Block, Row };
+
 
 /// Methods for building stacks:
 impl<B: Block> Stack<B> {
@@ -10,12 +12,12 @@ impl<B: Block> Stack<B> {
             self.new_layer()
         }
 
-        let layout = self.layouts.last().unwrap();
+        let layout = self.layouts.last_mut().unwrap();
         if layout.is_empty() {
             layout.push(0) // TODO function for this
         }
 
-        layout.last().unwrap() += 1;
+        *layout.last_mut().unwrap() += 1;
 
         self.blocks.push(block);
     }
@@ -32,7 +34,7 @@ impl<B: Block> Stack<B> {
         &mut self,
         l: usize,
         block: B
-    ) -> anyhow::Error<()> {
+    ) -> anyhow::Result<()> {
         if self.layouts.len() < l { 
             return Err(anyhow::anyhow!("Layer does not exist")) 
         }
@@ -42,10 +44,10 @@ impl<B: Block> Stack<B> {
             layout.push(0)
         }
 
-        layout.last().unwrap() += 1;
+        *layout.last_mut().unwrap() += 1;
         drop(layout);
 
-        let layer_end = self.find_layer_end(l); // TODO Get index of last block in layer
+        let layer_end = self.find_layer_end(l).unwrap(); // TODO Get index of last block in layer
         
         self.blocks.insert(layer_end, block);
         Ok(())
@@ -57,7 +59,7 @@ impl<B: Block> Stack<B> {
         l: usize,
         r: usize,
         block: B 
-    ) -> anyhow::Error<()> {
+    ) -> anyhow::Result<()> {
         if self.layouts.len() < l { 
             return Err(anyhow::anyhow!("Layer does not exist")) 
         }
@@ -92,14 +94,14 @@ impl<B: Block> Stack<B> {
     /// Add a row to the last layer in the stack.
     pub fn add_row(
         &mut self,
-        row: Row<B>
+        mut row: Row<B>
     ) {
         if self.layouts.len() == 0 {
             self.new_layer()
         }
 
-        self.layouts.last().unwrap().push(row.len());
-        self.blocks.append(*row);
+        self.layouts.last_mut().unwrap().push(row.len());
+        self.blocks.append(&mut row);
     }
 
     /// Add a collection of rows to the last layer in the stack.
@@ -163,7 +165,7 @@ impl<B: Block> Stack<B> {
         for layout in layouts.into_iter() {
             let total = layout.total();
             self.layouts.push(layout);
-            self.blocks.append(vec![B::create(instructions); total]);
+            self.blocks.append(&mut vec![B::create(instructions); total]);
         }
     }
 
@@ -177,7 +179,7 @@ impl<B: Block> Stack<B> {
         for layout in layouts.into_iter() {
             let total = layout.total();
             self.layouts.push(layout);
-            self.blocks.append(vec![block.clone(); total]);
+            self.blocks.append(&mut vec![block.clone(); total]);
         }
     }
 

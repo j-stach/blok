@@ -1,5 +1,7 @@
 
 use super::*;
+use crate::{ Block, Row, Layer };
+
 
 impl<B: Block> Stack<B> {
 
@@ -17,7 +19,7 @@ impl<B: Block> Stack<B> {
 
         let layouts = self.layouts();
         // If there are no blocks in the layer, return None.
-        if l > layouts.len() || &layouts[l].total() == 0 { 
+        if l > layouts.len() || layouts[l].total() == 0 { 
             return None 
         }
 
@@ -86,25 +88,17 @@ impl<B: Block> Stack<B> {
         &self,
         l: usize,
         r: usize,
-        mut i: usize
+        i: usize
     ) -> Option<&B> {
 
-        let layout = &self.layouts()[l];
-        let l_start = self.find_layer_start(l)?;
-        if r > layout.len() { 
-            return None 
+        let row_start = self.find_row_start(l, r)?;
+
+        if i >= self.layouts[l][r] {
+            return None
         }
 
-        let r_start = {
-            let mut sum = 0usize;
-            layout[0..row].iter().for_each(|_r| sum += _r);
-            sum
-        };
-
-        if i > layout[r] { return None }
-        i += l_start + r_start;
-
-        Some(&self.blocks[i])
+        let block = &self.blocks[row_start + i];
+        Some(block)
     }
 
     /// Get a vector of references to consecutive blocks.
@@ -146,10 +140,10 @@ impl<B: Block> Stack<B> {
     /// (Adding to this vector will not add blocks to the stack.)
     pub fn get_layer_ref(
         &self,
-        mut l: usize
+        l: usize
     ) -> Option<Vec<Vec<&B>>> {
 
-        let (start, end) = self.find_layer_bounds(l, r)?;
+        let (start, end) = self.find_layer_bounds(l)?;
         let blocks = self.get_range_ref(start, end)?;
         let layout = &self.layouts[l];
     
@@ -159,7 +153,7 @@ impl<B: Block> Stack<B> {
 
         for r in layout.iter() {
             let mut row = Vec::new();
-            for i in 0..r { // TBD how to implement 1-based array indexing... worth it?
+            for i in 0..*r { // TBD how to implement 1-based array indexing... worth it?
                 row.push(blocks[count]);
                 count += 1;
             }
@@ -175,25 +169,17 @@ impl<B: Block> Stack<B> {
         &mut self,
         l: usize,
         r: usize,
-        mut i: usize
+        i: usize
     ) -> Option<&mut B> {
 
-        let layout = &self.layouts()[l];
-        let l_start = self.find_layer_start(l)?;
-        if r > layout.len() { 
-            return None 
+        let row_start = self.find_row_start(l, r)?;
+
+        if i >= self.layouts[l][r] {
+            return None
         }
 
-        let r_start = {
-            let mut sum = 0usize;
-            layout[0..row].iter().for_each(|_r| sum += _r);
-            sum
-        };
-
-        if i > layout[r] { return None }
-        i += l_start + r_start;
-
-        Some(&mut self.blocks[i])
+        let block = &mut self.blocks[row_start + i];
+        Some(block)
     }
 
     /// Get a vector of references to consecutive blocks.
@@ -201,7 +187,7 @@ impl<B: Block> Stack<B> {
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
     pub fn get_range_mut(
-        &self,
+        &mut self,
         start: usize,
         end: usize
     ) -> Option<Vec<&mut B>> {
@@ -222,16 +208,11 @@ impl<B: Block> Stack<B> {
     pub fn get_row_mut(
         &mut self,
         l: usize,
-        mut r: usize
-    ) -> Option<Vec<&mut B>> { // TBD RowRef type?
+        r: usize
+    ) -> Option<Vec<&mut B>> { 
 
-        // No need to repeat checks.
-        let row_start = self.find_row_start(l, r)?;
-        let row_end = self.find_row_end(l, r)?;
-
-        let blocks: Vec<&mut B> = self.blocks[row_start..=row_end].iter_mut().collect();
-        let blocks = self.get_range_mut()
-        Some(row)
+        let (start, end) = self.find_row_bounds(l, r)?;
+        self.get_range_mut(start, end)
     }
 
     /// Get a vector of vectors of mutable references to the blocks that represent a layer.
@@ -240,21 +221,20 @@ impl<B: Block> Stack<B> {
     /// (Adding to this vector will not add blocks to the stack.)
     pub fn get_layer_mut (
         &mut self,
-        mut l: usize
+        l: usize
     ) -> Option<Vec<Vec<&mut B>>> {
 
-        let layer_start = self.find_layer_start(l)?;
-        let layer_end = self.find_layer_end(l)?;
-
-        let layout = &self.layouts[l];
-        let blocks: Vec<&mut B> = self.blocks[layer_start..=layer_end].iter_mut().collect();
+        let layout = self.layouts[l].clone();
+        let (start, end) = self.find_layer_bounds(l)?;
+        let blocks = self.get_range_mut(start, end)?;
     
+        // TODO Dry
         let mut rows = Vec::new();
         let mut count = 0usize;
 
         for r in layout.iter() {
             let mut row = Vec::new();
-            for i in 0..r { // TBD how to implement 1-based array indexing... worth it?
+            for i in 0..*r { // TBD how to implement 1-based array indexing... worth it?
                 row.push(blocks[count]);
                 count += 1;
             }
@@ -275,21 +255,16 @@ impl<B: Block> Stack<B> {
     /// Clone a layer from the stack and return it as a new structure.
     pub fn clone_layer(&self, l: usize) -> Option<Layer<B>> {
 
-        let layouts = self.layouts();
-        if l > layouts.len() { 
-            return None 
-        }
+        let layout = self.layouts.get(l)?;
+        let (start, end) = self.find_layer_bounds(l)?;
 
-        let layout = &layouts[l];
-        let start = self.find_layer_start(l)?;
-        let end = start + layout.total();
-
-        let mut layer = Layer::new();
+        let mut layer = Layer::default();
+        // TODO Revisit this:
         layer.set_from_layout(
             layout.clone(), 
             self.blocks()[start..end].to_vec()
         )
-        .expect("Layout corrupted"); // TODO Error
+        .unwrap();
 
         Some(layer)
     }
@@ -302,7 +277,7 @@ impl<B: Block> Stack<B> {
     ) -> Option<Row<B>> {
 
         let blocks: Vec<B> = self.get_row_ref(l, r)?
-            .iter()
+            .into_iter()
             .map(|b| b.clone())
             .collect();
 

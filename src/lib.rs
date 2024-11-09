@@ -1,4 +1,6 @@
 
+#![allow(unused_variables)]
+
 pub mod block;
 pub use block::Block;
 

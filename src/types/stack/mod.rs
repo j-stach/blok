@@ -1,5 +1,11 @@
 
-#[allow(unused_imports)]
+pub mod build;
+pub mod partial;
+pub mod clone;
+//pub mod connect;
+//pub mod transform;
+//pub mod void;
+
 use crate::{ Block, Layer, Layout };
 
 
