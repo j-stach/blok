@@ -13,7 +13,7 @@ use crate::Block;
 /// that represents the entire collection
 /// (i.e. all of the blocks in a layer or stack).
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
-pub struct Row<B: Block>(Vec<B>);
+pub struct Row<B: Block>(pub(crate) Vec<B>);
 
 impl<B: Block> Row<B> {
 
