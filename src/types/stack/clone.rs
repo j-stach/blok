@@ -1,6 +1,16 @@
 
 use super::*;
+use crate::{ Layout, Row };
 
+//
+// TODO
+// These are sloppy and inefficient. 
+// Don't clone multiple times, rewrite the algorithms for efficiency.
+//
+
+
+/// Methods for cloning blocks and setting stacks directly from blocks.
+/// Useful when building or connecting asynchronously with blocks that are Sync + Send.
 impl<B: Block> Stack<B> {
 
     /// Clone the stack into an array of layers.
@@ -23,18 +33,52 @@ impl<B: Block> Stack<B> {
 
     /// Overwrite the stack's values from an array of layers.
     pub fn set_from_layers(&mut self, layers: Vec<Layer<B>>) {
-        *self.layouts_mut() = layers.iter()
+        self.layouts = layers.iter()
             .map(|layer| layer.layout().clone())
             .collect();
 
-        *self.blocks_mut() = layers.iter()
+        self.blocks = layers.iter()
             .flat_map(|layer| layer.blocks().clone())
             .collect();
     }
 
-    // TODO:
-    // clone_into_rows
-    // set_from_rows
+    /// Clone the stack into a matrix of rows.
+    pub fn clone_into_rows(&self) -> Vec<Vec<Row<B>>> {
+
+        let blocks = self.clone_into_blocks();
+
+        blocks.into_iter()
+            .map(|layer|
+                layer.into_iter()
+                    .map(|row| Row::wrap(row))
+                    .collect::<Vec<Row<B>>>()
+            )
+            .collect::<Vec<Vec<Row<B>>>>()
+    }
+
+    /// Overwrite the stack's values from a matrix of rows.
+    pub fn set_from_rows(&mut self, rows: Vec<Vec<Row<B>>>) {
+
+        let mut layouts = Vec::new();
+
+        for layer in rows.iter() {
+            let layout: Vec<usize> = layer.iter().map(|r| r.len()).collect();
+            let layout = Layout::wrap(layout);
+            layouts.push(layout);
+        }
+
+        let blocks: Vec<B> = rows.into_iter()
+            .flat_map(|layer| 
+                layer.into_iter()
+                    .flat_map(|row| row.0)
+                    .collect::<Vec<B>>()
+            )
+            .collect();
+
+        self.layouts = layouts;
+        self.blocks = blocks;
+
+    }
 
     /// Clone the stack into a matrix of blocks.
     pub fn clone_into_blocks(&self) -> Vec<Vec<Vec<B>>> {
