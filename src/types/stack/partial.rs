@@ -226,19 +226,16 @@ impl<B: Block> Stack<B> {
 
         let layout = self.layouts[l].clone();
         let (start, end) = self.find_layer_bounds(l)?;
-        let blocks = self.get_range_mut(start, end)?;
+        let mut blocks = self.get_range_mut(start, end)?;
     
         // TODO Dry
         let mut rows = Vec::new();
         let mut count = 0usize;
 
         for r in layout.iter() {
-            let mut row = Vec::new();
-            for i in 0..*r { // TBD how to implement 1-based array indexing... worth it?
-                row.push(blocks[count]);
-                count += 1;
-            }
-            rows.push(row)
+            let remainder = blocks.split_off(*r);
+            rows.push(blocks);
+            blocks = remainder;
         }
 
         Some(rows)
@@ -262,7 +259,7 @@ impl<B: Block> Stack<B> {
         // TODO Revisit this:
         layer.set_from_layout(
             layout.clone(), 
-            self.blocks()[start..end].to_vec()
+            self.blocks()[start..end].to_vec() 
         )
         .unwrap();
 
