@@ -1,6 +1,11 @@
 
 use super::*;
 
+//
+// TODO: 
+// Transformations without cloning
+//
+
 /// Transformations
 impl<B: Block> Stack<B> {
 

@@ -1,6 +1,12 @@
 
 use super::*;
 
+//
+// TODO:
+// - Voids without cloning
+// - Collapse function
+//
+
 /// Functions for working with gaps and empty space:
 impl<B: Block> Stack<B> {
 

@@ -2,6 +2,11 @@
 use super::*;
 use crate::{ Block, Row };
 
+// 
+// TODO:
+// Clean and standardize algorithms
+//
+
 
 /// Methods for building stacks:
 impl<B: Block> Stack<B> {

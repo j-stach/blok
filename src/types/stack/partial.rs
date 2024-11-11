@@ -1,8 +1,18 @@
 
 use super::*;
-use crate::{ Block, Row, Layer };
+use crate::Block;
 
 
+//
+// TODO:
+// - References for vertical slices.
+// - Adjacent blocks 
+// -- OR!! -- 
+// - A path-walking module for building different collections.
+//
+
+
+/// Methods for referencing interior elements:
 impl<B: Block> Stack<B> {
 
     /// Find the block indexes for the start and end of the layer.
@@ -254,59 +264,6 @@ impl<B: Block> Stack<B> {
         }
 
         Some(rows)
-    }
-
-
-    //
-    // TODO:
-    // - Correspinding indices by layer, by row in layer, etc, for vertical slices.
-    // - Adjacent blocks -- OR!! -- A path-walking module for building different collections.
-    //
-
-
-    /// Clone a layer from the stack and return it as a new structure.
-    pub fn clone_layer(&self, l: usize) -> Option<Layer<B>> {
-
-        let layout = self.layouts.get(l)?;
-        let (start, end) = self.find_layer_bounds(l)?;
-
-        let mut layer = Layer::default();
-        // TODO Revisit this:
-        layer.set_from_layout(
-            layout.clone(), 
-            self.blocks()[start..end].to_vec() 
-        )
-        .unwrap();
-
-        Some(layer)
-    }
-
-    /// Clone a row from the stack and return it as a new structure.
-    pub fn clone_row (
-        &self, 
-        l: usize,
-        r: usize
-    ) -> Option<Row<B>> {
-
-        let blocks: Vec<B> = self.get_row_ref(l, r)?
-            .into_iter()
-            .map(|b| b.clone())
-            .collect();
-
-        let row = Row::wrap(blocks);
-        Some(row)
-    }
-
-    /// Clone a block from the stack and return it as a new structure.
-    pub fn clone_block (
-        &self, 
-        l: usize,
-        r: usize,
-        i: usize
-    ) -> Option<B> {
-
-        let block = self.get_block_ref(l, r, i)?;
-        Some(block.clone())
     }
 
 }

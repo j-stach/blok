@@ -11,6 +11,7 @@ use crate::{ Layout, Row };
 
 /// Methods for cloning blocks and setting stacks directly from blocks.
 /// Useful when building or connecting asynchronously with blocks that are Sync + Send.
+/// Partial clones are also found here.
 impl<B: Block> Stack<B> {
 
     /// Clone the stack into an array of layers.
@@ -103,6 +104,51 @@ impl<B: Block> Stack<B> {
         }
 
         self.set_from_layers(layers);
+    }
+
+    /// Clone a layer from the stack and return it as a new structure.
+    pub fn clone_layer(&self, l: usize) -> Option<Layer<B>> {
+
+        let layout = self.layouts.get(l)?;
+        let (start, end) = self.find_layer_bounds(l)?;
+
+        let mut layer = Layer::default();
+        // TODO Revisit this:
+        layer.set_from_layout(
+            layout.clone(), 
+            self.blocks()[start..end].to_vec() 
+        )
+        .unwrap();
+
+        Some(layer)
+    }
+
+    /// Clone a row from the stack and return it as a new structure.
+    pub fn clone_row (
+        &self, 
+        l: usize,
+        r: usize
+    ) -> Option<Row<B>> {
+
+        let blocks: Vec<B> = self.get_row_ref(l, r)?
+            .into_iter()
+            .map(|b| b.clone())
+            .collect();
+
+        let row = Row::wrap(blocks);
+        Some(row)
+    }
+
+    /// Clone a block from the stack and return it as a new structure.
+    pub fn clone_block (
+        &self, 
+        l: usize,
+        r: usize,
+        i: usize
+    ) -> Option<B> {
+
+        let block = self.get_block_ref(l, r, i)?;
+        Some(block.clone())
     }
 
 }
