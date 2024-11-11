@@ -13,10 +13,8 @@ impl<B: Block> Stack<B> {
         }
 
         let layout = self.layouts.last_mut().unwrap();
-        if layout.is_empty() {
-            layout.push(0) // TODO function for this
-        }
-
+        // TODO function for this:
+        if layout.is_empty() { layout.push(0) }
         *layout.last_mut().unwrap() += 1;
 
         self.blocks.push(block);
@@ -40,14 +38,11 @@ impl<B: Block> Stack<B> {
         }
 
         let layout = &mut self.layouts[1];
-        if layout.is_empty() {
-            layout.push(0)
-        }
-
+        // TODO function for this:
+        if layout.is_empty() { layout.push(0) }
         *layout.last_mut().unwrap() += 1;
-        drop(layout);
 
-        let layer_end = self.find_layer_end(l).unwrap(); // TODO Get index of last block in layer
+        let layer_end = self.find_layer_end(l).unwrap(); 
         
         self.blocks.insert(layer_end, block);
         Ok(())
@@ -64,16 +59,16 @@ impl<B: Block> Stack<B> {
             return Err(anyhow::anyhow!("Layer does not exist")) 
         }
 
-        let layout = &mut self.layouts[1];
+        let row_end = self.find_row_end(l, r);
+        let row_layout = self.layouts[1].get_mut(r);
 
-        if layout.len() < r {
+        if row_end.is_none() || row_layout.is_none() {
             return Err(anyhow::anyhow!("Row does not exist")) 
         }
 
-        // get row start?
-        let row_end = self.find_row_end(l, r); // TODO get last block index by row
+        self.blocks.insert(row_end.unwrap() + 1, block);
+        *row_layout.unwrap() += 1;
 
-        // hmm
         Ok(())
     }
 
@@ -84,11 +79,16 @@ impl<B: Block> Stack<B> {
         r: usize,
         i: usize,
         block: B 
-    ) {
+    ) -> anyhow::Result<()> {
 
-        // hmm
-        todo![""]
+        let index = self.find_block_index(l, r, i);
+        if index.is_none() {
+            return Err(anyhow::anyhow!("Index does not exist"))
+        }
 
+        self.blocks.insert(index.unwrap(), block);
+        self.layouts[l][r] += 1;
+        Ok(())
     }
 
     /// Add a row to the last layer in the stack.
@@ -118,12 +118,22 @@ impl<B: Block> Stack<B> {
     pub fn add_row_to_layer(
         &mut self,
         l: usize,
-        row: Row<B>
-    ) {
+        mut row: Row<B>
+    ) -> anyhow::Result<()> {
 
-        // hmm
-        todo![""]
+        if self.layouts.len() < l { 
+            return Err(anyhow::anyhow!("Layer does not exist")) 
+        }
 
+        let layer_end = self.find_layer_end(l).unwrap();
+
+        self.layouts[l].push(row.len());
+        let mut tail = self.blocks.split_off(layer_end);
+
+        self.blocks.append(&mut row);
+        self.blocks.append(&mut tail);
+
+        Ok(())
     }
 
     /// Allocate a new layer on the stack.
@@ -147,12 +157,22 @@ impl<B: Block> Stack<B> {
     /// Add a pre-existing layer at a specific position in the stack.
     pub fn insert_layer(
         &mut self, 
-        index: usize, 
-        layer: Layer<B>
-    ) {
-        let mut layers = self.clone_into_layers();
-        layers.insert(index, layer);
-        self.set_from_layers(layers)
+        l: usize, 
+        mut layer: Layer<B>
+    ) -> anyhow::Result<()> {
+        if self.layouts.len() < l { 
+            return Err(anyhow::anyhow!("Layer does not exist")) 
+        }
+
+        let layer_end = self.find_layer_end(l).unwrap();
+
+        self.layouts.push(layer.layout().clone());
+        let mut tail = self.blocks.split_off(layer_end);
+
+        self.blocks.append(layer.blocks_mut());
+        self.blocks.append(&mut tail);
+
+        Ok(())
     }
 
     /// Create blocks using the given constructor,
