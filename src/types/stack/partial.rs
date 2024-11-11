@@ -82,6 +82,23 @@ impl<B: Block> Stack<B> {
         Some(layer_start + row_end)
     }
 
+    /// Find the block index given its position in the stack.
+    /// Returns None if the block does not exist.
+    pub fn find_block_index(
+        &self,
+        l: usize,
+        r: usize,
+        i: usize
+    ) -> Option<usize> {
+
+        let (start, end) = self.find_row_bounds(l, r)?;
+        if end - start > i { 
+            None 
+        } else {
+            Some(start + i)
+        }
+    }
+
     /// Get a reference to the block at the given index.
     /// Returns None if the block could not be found.
     pub fn get_block_ref(
@@ -228,10 +245,8 @@ impl<B: Block> Stack<B> {
         let (start, end) = self.find_layer_bounds(l)?;
         let mut blocks = self.get_range_mut(start, end)?;
     
-        // TODO Dry
+        // TODO Dry, & sync with ref version?
         let mut rows = Vec::new();
-        let mut count = 0usize;
-
         for r in layout.iter() {
             let remainder = blocks.split_off(*r);
             rows.push(blocks);
