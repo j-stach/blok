@@ -209,7 +209,7 @@ impl<B: Block> Stack<B> {
         Some(block)
     }
 
-    /// Get a vector of references to consecutive blocks.
+    /// Get a vector of mutable references to consecutive blocks.
     /// Returns None if the range does not exist in the stack.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)

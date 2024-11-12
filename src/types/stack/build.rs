@@ -5,6 +5,8 @@ use crate::{ Block, Row };
 // 
 // TODO:
 // Clean and standardize algorithms
+// Minor additions - add_blocks_to_row/layer?
+// Helper functions as needed
 //
 
 
@@ -12,9 +14,9 @@ use crate::{ Block, Row };
 impl<B: Block> Stack<B> {
 
     /// Add a block to the last row of the last layer.
-    pub fn add_block(&mut self, block: B) {
+    pub fn add_block(&mut self, block: B) -> &mut Self {
         if self.layouts.is_empty() {
-            self.new_layer()
+            self.new_layer();
         }
 
         let layout = self.layouts.last_mut().unwrap();
@@ -23,13 +25,16 @@ impl<B: Block> Stack<B> {
         *layout.last_mut().unwrap() += 1;
 
         self.blocks.push(block);
+
+        self
     }
 
     /// Add a collection of blocks to the last row of the last layer.
-    pub fn add_blocks(&mut self, blocks: Vec<B>) {
+    pub fn add_blocks(&mut self, blocks: Vec<B>) -> &mut Self {
         for block in blocks.into_iter() {
-            self.add_block(block)
+            self.add_block(block);
         }
+        self
     }
 
     /// Add a block to the last row of the given layer.
@@ -37,7 +42,8 @@ impl<B: Block> Stack<B> {
         &mut self,
         l: usize,
         block: B
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<&mut Self> {
+
         if self.layouts.len() < l { 
             return Err(anyhow::anyhow!("Layer does not exist")) 
         }
@@ -50,7 +56,7 @@ impl<B: Block> Stack<B> {
         let layer_end = self.find_layer_end(l).unwrap(); 
         
         self.blocks.insert(layer_end, block);
-        Ok(())
+        Ok(self)
     }
 
     /// Add a block to the end of the given row in the given layer.
@@ -59,7 +65,8 @@ impl<B: Block> Stack<B> {
         l: usize,
         r: usize,
         block: B 
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<&mut Self> {
+
         if self.layouts.len() < l { 
             return Err(anyhow::anyhow!("Layer does not exist")) 
         }
@@ -74,7 +81,7 @@ impl<B: Block> Stack<B> {
         self.blocks.insert(row_end.unwrap() + 1, block);
         *row_layout.unwrap() += 1;
 
-        Ok(())
+        Ok(self)
     }
 
     /// Insert a block at the specific layer, row, index.
@@ -84,7 +91,7 @@ impl<B: Block> Stack<B> {
         r: usize,
         i: usize,
         block: B 
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<&mut Self> {
 
         let index = self.find_block_index(l, r, i);
         if index.is_none() {
@@ -93,30 +100,59 @@ impl<B: Block> Stack<B> {
 
         self.blocks.insert(index.unwrap(), block);
         self.layouts[l][r] += 1;
-        Ok(())
+        Ok(self)
+    }
+
+    /// Insert a collection of blocks beginning at the given layer, row, index.
+    pub fn insert_blocks(
+        &mut self,
+        l: usize,
+        r: usize,
+        i: usize,
+        mut blocks: Vec<B>
+    ) -> anyhow::Result<&mut Self> {
+
+        let index = self.find_block_index(l, r, i);
+        if index.is_none() {
+            return Err(anyhow::anyhow!("Index does not exist"))
+        }
+
+        let total = blocks.len();
+        let mut tail = self.blocks.split_off(index.unwrap());
+
+        self.blocks.append(&mut blocks);
+        self.blocks.append(&mut tail);
+        self.layouts[l][r] += total;
+
+        Ok(self)
     }
 
     /// Add a row to the last layer in the stack.
     pub fn add_row(
         &mut self,
         mut row: Row<B>
-    ) {
+    ) -> &mut Self {
+
         if self.layouts.len() == 0 {
-            self.new_layer()
+            self.new_layer();
         }
 
         self.layouts.last_mut().unwrap().push(row.len());
         self.blocks.append(&mut row);
+
+        self
     }
 
     /// Add a collection of rows to the last layer in the stack.
     pub fn add_rows(
         &mut self,
         rows: Vec<Row<B>>
-    ) {
+    ) -> &mut Self {
         for row in rows.into_iter() {
-            self.add_row(row)
+            self.add_row(row);
         }
+
+        self
     }
 
     /// Add a row to the end of the given layer.
@@ -124,7 +160,7 @@ impl<B: Block> Stack<B> {
         &mut self,
         l: usize,
         mut row: Row<B>
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<&mut Self> {
 
         if self.layouts.len() < l { 
             return Err(anyhow::anyhow!("Layer does not exist")) 
@@ -138,25 +174,35 @@ impl<B: Block> Stack<B> {
         self.blocks.append(&mut row);
         self.blocks.append(&mut tail);
 
-        Ok(())
+        Ok(self)
     }
 
+
+    //
+    // TODO:
+    // insert_row
+    //
+
+
     /// Allocate a new layer on the stack.
-    pub fn new_layer(&mut self) {
-        self.layouts_mut().push(Layout::new())
+    pub fn new_layer(&mut self) -> &mut Self {
+        self.layouts_mut().push(Layout::new());
+        self
     }
 
     /// Add a pre-existing layer to the top of the stack.
-    pub fn add_layer(&mut self, mut layer: Layer<B>) {
+    pub fn add_layer(&mut self, mut layer: Layer<B>) -> &mut Self {
         self.layouts_mut().push(layer.layout().clone());
         self.blocks_mut().append(&mut layer.blocks_mut());
+        self
     }
 
     /// Add an array of pre-existing layers to the top of the stack.
-    pub fn add_layers(&mut self, layers: Vec<Layer<B>>) {
+    pub fn add_layers(&mut self, layers: Vec<Layer<B>>) -> &mut Self {
         for layer in layers { 
-            self.add_layer(layer) 
+            self.add_layer(layer); 
         }
+        self
     }
 
     /// Add a pre-existing layer at a specific position in the stack.
@@ -164,7 +210,7 @@ impl<B: Block> Stack<B> {
         &mut self, 
         l: usize, 
         mut layer: Layer<B>
-    ) -> anyhow::Result<()> {
+    ) -> anyhow::Result<&mut Self> {
         if self.layouts.len() < l { 
             return Err(anyhow::anyhow!("Layer does not exist")) 
         }
@@ -177,7 +223,7 @@ impl<B: Block> Stack<B> {
         self.blocks.append(layer.blocks_mut());
         self.blocks.append(&mut tail);
 
-        Ok(())
+        Ok(self)
     }
 
     /// Create blocks using the given constructor,
@@ -186,12 +232,14 @@ impl<B: Block> Stack<B> {
         &mut self,
         layouts: Vec<Layout>,
         instructions: &B::CreationInstructions
-    ) {
+    ) -> &mut Self {
+
         for layout in layouts.into_iter() {
             let total = layout.total();
             self.layouts.push(layout);
             self.blocks.append(&mut vec![B::create(instructions); total]);
         }
+        self
     }
 
     /// Create blocks by cloning a prototype,
@@ -200,12 +248,14 @@ impl<B: Block> Stack<B> {
         &mut self,
         layouts: Vec<Layout>,
         block: &B
-    ) {
+    ) -> &mut Self {
+
         for layout in layouts.into_iter() {
             let total = layout.total();
             self.layouts.push(layout);
             self.blocks.append(&mut vec![block.clone(); total]);
         }
+        self
     }
 
 }

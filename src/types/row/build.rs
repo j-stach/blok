@@ -6,17 +6,39 @@ use super::*;
 impl<B: Block> Row<B> {
 
     /// Add a block to the end of the row. 
-    pub fn add_block(&mut self, block: B) {
-        self.push(block)
+    pub fn add_block(&mut self, block: B) -> &mut Self {
+        self.push(block);
+        self
     }
 
-    /// Insert a block into teh row at the given index.
+    /// Add a collection of blocks to the end of the row.
+    pub fn add_blocks(&mut self, mut blocks: Vec<B>) -> &mut Self {
+        self.append(&mut blocks);
+        self
+    }
+
+    /// Insert a block into the row at the given index.
     pub fn insert_block(
         &mut self, 
-        index: usize, 
+        i: usize, 
         block: B
-    ) {
-        self.insert(index, block)
+    ) -> &mut Self {
+
+        self.insert(i, block);
+        self
+    }
+    
+    /// Insert a collection of blocks into the row at the given index.
+    pub fn insert_blocks(
+        &mut self, 
+        i: usize, 
+        mut blocks: Vec<B>
+    ) -> anyhow::Result<&mut Self> {
+
+        let mut tail = self.split_off(i);
+        self.append(&mut blocks);
+        self.append(&mut tail);
+        Ok(self)
     }
 
     /// Create a number of blocks using the given constructor,
@@ -25,8 +47,10 @@ impl<B: Block> Row<B> {
         &mut self,
         count: usize,
         instructions: &B::CreationInstructions
-    ) {
-        self.append(&mut vec![B::create(instructions); count])
+    ) -> &mut Self {
+
+        self.append(&mut vec![B::create(instructions); count]);
+        self
     }
 
     /// Create a number of blocks by cloning a prototype,
@@ -35,8 +59,10 @@ impl<B: Block> Row<B> {
         &mut self,
         count: usize,
         block: &B
-    ) {
-        self.append(&mut vec![block.clone(); count])
+    ) -> &mut Self {
+
+        self.append(&mut vec![block.clone(); count]);
+        self
     }
 
     // TODO remove_block

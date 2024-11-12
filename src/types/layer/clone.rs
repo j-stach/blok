@@ -27,11 +27,11 @@ impl<B: Block> Layer<B> {
 
     /// Overwrite a layer's values from a matrix of blocks.
     pub fn set_from_blocks(&mut self, blocks: Vec<Vec<B>>) {
-        *self.layout_mut() = blocks.iter()
+        self.layout = blocks.iter()
             .map(|v| v.len())
             .collect();
 
-        *self.blocks_mut() = blocks.into_iter()
+        self.blocks = blocks.into_iter()
             .flatten()
             .collect();
     }
