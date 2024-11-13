@@ -5,7 +5,8 @@
 - [ ] Cleaning
 - [ ] Errors handled (thiserror)
 - [ ] Optimization (in-place modification instead of cloning)
-- [ ] Builder chain returning &self, &mut self, etc.
+- [ ] Standardize and DRY
+- [x] Builder chain returning &self, &mut self, etc.
 - [ ] 1-based indexing to make lengths vs. indexes easier?
 
 ----
@@ -44,9 +45,17 @@
 - [ ] collapse 
 - [ ] fusion/merge_overlap 
 - [ ] realize_volume
+- [ ] Vertical slices for partial ref
+- [ ] insert_row
 
+## order 
+### layout
+- [ ] empty_row
+- [ ] initialize
 
 ----
 
 ## docs
 - Builder arguments follow add(where, what) schema ("Little endian?")
+- Functional build process, returns error or self 
+- Partial references return None when the index DNE

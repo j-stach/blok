@@ -3,7 +3,7 @@
 name = "blok"
 description = "3D arrays that matter"
 authors = ["j-stach"]
-version = "0.0.1"
+version = "0.0.2"
 edition = "2021"
 repository = "https://github.com/j-stach/blok"
 license = "MIT OR Apache-2.0"
@@ -21,6 +21,7 @@ serde = { version = "1.0.200", features = ["derive"] }
 anal-eyes = "0.0.1"
 
 [[test]]
-name = "block_test"
-path = "test/block.rs"
+name = "layout_test"
+path = "test/order/layout.rs"
+
 

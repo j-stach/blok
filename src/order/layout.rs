@@ -5,7 +5,7 @@ use serde::{ Serialize, Deserialize };
 
 /// Represents the "shape" of the array layer for easy indexing.
 #[derive(Deref, DerefMut, Debug, Default, Clone, Serialize, Deserialize)]
-pub struct Layout(pub Vec<usize>);
+pub struct Layout(pub(crate) Vec<usize>);
 
 impl Layout {
     /// Create a default (empty) layout.
