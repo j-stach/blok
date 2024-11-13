@@ -22,10 +22,14 @@ impl<B: Block> Row<B> {
         &mut self, 
         i: usize, 
         block: B
-    ) -> &mut Self {
+    ) -> anyhow::Result<&mut Self> {
+
+        if self.len() < i {
+            return Err(anyhow::anyhow!("Bad block index"))
+        }
 
         self.insert(i, block);
-        self
+        Ok(self)
     }
     
     /// Insert a collection of blocks into the row at the given index.
@@ -34,6 +38,10 @@ impl<B: Block> Row<B> {
         i: usize, 
         mut blocks: Vec<B>
     ) -> anyhow::Result<&mut Self> {
+
+        if self.len() < i {
+            return Err(anyhow::anyhow!("Bad block index"))
+        }
 
         let mut tail = self.split_off(i);
         self.append(&mut blocks);

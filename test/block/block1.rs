@@ -3,8 +3,8 @@ use blok::Block;
 
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
 pub struct TestBlock1 {
-    id: String,
-    connections: Vec<String>,
+    pub id: String,
+    pub connections: Vec<String>,
 }
 
 impl Block for TestBlock1 {
@@ -41,6 +41,8 @@ impl Block for TestBlock1 {
 /// Test for creating new blocks.
 #[test] fn new_block_test() {
     let block1 = TestBlock1::create(&"block1".to_string());
+    assert_eq!(block1.id, "block1");
+    assert_eq!(block1.connections.len(), 0);
 }
 
 /// Test using block connections.
@@ -57,7 +59,7 @@ impl Block for TestBlock1 {
 /// Test using void blocks.
 #[test] fn void_block_test() {
     let mut a = TestBlock1::create(&"NotVoid".to_string());
-    let mut b = TestBlock1::void();
+    let b = TestBlock1::void();
     assert!(b.is_void() && !a.is_void());
 
     a.to_void();
