@@ -21,10 +21,18 @@ serde = { version = "1.0.200", features = ["derive"] }
 anal-eyes = "0.0.1"
 
 [[test]]
-name = "layout_test"
-path = "test/order/layout.rs"
+name = "tests"
+path = "test/mod.rs"
 
-[[test]]
-name = "block_test_1"
-path = "test/block/block1.rs"
-
+#[[test]]
+#name = "layout_test"
+#path = "test/order/layout.rs"
+#
+#[[test]]
+#name = "block_test_1"
+#path = "test/block/block1.rs"
+#
+#[[test]]
+#name = "row_test"
+#path = "test/types/row/row.rs"
+#

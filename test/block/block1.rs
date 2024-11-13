@@ -2,17 +2,17 @@
 use blok::Block;
 
 #[derive(Debug, Default, Clone, Eq, PartialEq)]
-pub struct TestBlock {
+pub struct TestBlock1 {
     id: String,
     connections: Vec<String>,
 }
 
-impl Block for TestBlock {
+impl Block for TestBlock1 {
     type CreationInstructions = String;
     type ConnectionInstructions = u32;
 
     fn create(id: &String) -> Self {
-        TestBlock {
+        TestBlock1 {
             id: id.to_owned(),
             connections: Vec::new(),
         }
@@ -37,15 +37,16 @@ impl Block for TestBlock {
     }
 }
 
+
 /// Test for creating new blocks.
 #[test] fn new_block_test() {
-    let block1 = TestBlock::create(&"block1".to_string());
+    let block1 = TestBlock1::create(&"block1".to_string());
 }
 
 /// Test using block connections.
 #[test] fn connect_block_test() {
-    let mut a = TestBlock::create(&"a".to_string());
-    let mut b = TestBlock::create(&"b".to_string());
+    let mut a = TestBlock1::create(&"a".to_string());
+    let mut b = TestBlock1::create(&"b".to_string());
 
     a.connect(&mut b, &1);
     assert_eq!(&a.connections[0], &b.id);
@@ -55,8 +56,8 @@ impl Block for TestBlock {
 
 /// Test using void blocks.
 #[test] fn void_block_test() {
-    let mut a = TestBlock::create(&"NotVoid".to_string());
-    let mut b = TestBlock::void();
+    let mut a = TestBlock1::create(&"NotVoid".to_string());
+    let mut b = TestBlock1::void();
     assert!(b.is_void() && !a.is_void());
 
     a.to_void();
@@ -65,13 +66,13 @@ impl Block for TestBlock {
 
 /// Test modifying blocks in place.
 #[test] fn modify_block_test() {
-    let mut a = TestBlock::create(&"NotVoid".to_string());
-    let mut b = TestBlock::void();
+    let mut a = TestBlock1::create(&"NotVoid".to_string());
+    let mut b = TestBlock1::void();
 
     a.shift(&mut b);
     assert_eq!("NotVoid", &b.id);
 
-    a.overwrite(TestBlock::create(&"NotVoidEither".to_string()));
+    a.overwrite(TestBlock1::create(&"NotVoidEither".to_string()));
     assert_eq!(&a.id, "NotVoidEither");
 
     a.shift(&mut b);
