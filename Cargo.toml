@@ -24,4 +24,7 @@ anal-eyes = "0.0.1"
 name = "layout_test"
 path = "test/order/layout.rs"
 
+[[test]]
+name = "block_test_1"
+path = "test/block/block1.rs"
 
