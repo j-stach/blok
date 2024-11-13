@@ -24,7 +24,6 @@ impl<B: Block> Layer<B> {
         self.layout.row_end(r)
     }
 
-    /// Finds the index for a block given its placement in the layer.
     /// Returns None if the block could not be found.
     pub fn find_block_index(
         &self,

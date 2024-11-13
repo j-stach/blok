@@ -71,7 +71,7 @@ impl<B: Block> Stack<B> {
         let blocks: Vec<B> = rows.into_iter()
             .flat_map(|layer| 
                 layer.into_iter()
-                    .flat_map(|row| row.0)
+                    .flat_map(|row| row.blocks)
                     .collect::<Vec<B>>()
             )
             .collect();
