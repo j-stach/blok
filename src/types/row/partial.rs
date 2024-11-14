@@ -51,5 +51,4 @@ impl<B: Block> Row<B> {
         Some(blocks)
     }
 
-
 }

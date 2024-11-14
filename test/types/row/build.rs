@@ -1,7 +1,6 @@
 
-use crate::block::TestBlock1;
-
 use blok::{ Block, Row };
+use crate::block::TestBlock1;
 
 /// Test row creation.
 #[test] fn new_row_test() {
@@ -97,3 +96,21 @@ use blok::{ Block, Row };
     assert_eq!(ids, other_ids);
 }
 
+#[test] fn clone_row_test() {
+    let mut row = Row::default();
+    row.populate(4, &"test".to_string());
+    let ids: Vec<&str> = row.iter()
+        .map(|block: &TestBlock1| block.id.as_str())
+        .collect();
+    
+    let blocks = row.clone_into_blocks();
+    assert_eq!(blocks.len(), row.len());
+    blocks.iter().for_each(|block| assert_eq!(&block.id, "test"));
+
+    row.set_from_blocks(blocks);
+    let other_ids: Vec<&str> = row.iter()
+        .map(|block: &TestBlock1| block.id.as_str())
+        .collect();
+
+    assert_eq!(ids, other_ids);
+}

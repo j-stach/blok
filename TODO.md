@@ -18,10 +18,18 @@
 - [ ] How to nest blok traits (ie, how to use a stack as a block)
 - [ ] Implementing block for sync and send, connecting using clones
 ## tests
-- [ ] block.rs 
-- [ ] layer.rs
-- [ ] stack.rs
+### block
+- [ ] additional/variable blocks
+### connect
 - [ ] connect/mod.rs
+- [ ] connection preservation during clone, move, etc.
+### row
+- [x] build/clone
+- [x] partial
+### layer
+- [ ] layer.rs
+### stack
+- [ ] stack.rs
 
 ----
 - [ ] TODO! Needs `disconnect` method for Block trait
