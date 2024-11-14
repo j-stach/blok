@@ -45,6 +45,7 @@ impl<B: Block> Stack<B> {
         &mut self, 
         instructions: &B::CreationInstructions
     ) {
+        // TODO Without cloning
         let mut layers = self.clone_into_layers();
         for layer in layers.iter_mut() {
             layer.fill_voids(instructions)

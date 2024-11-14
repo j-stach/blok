@@ -38,6 +38,12 @@ impl<B: Block> Layer<B> {
         }
     }
 
+    //
+    // TODO
+    // pad_x
+    // pad_y
+    //
+
     /// Square off the matrix to the highest row length,
     /// by inserting void blocks into the empty indices.
     pub fn realize_voids(&mut self) -> &mut Self {

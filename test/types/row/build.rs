@@ -102,6 +102,7 @@ use crate::block::TestBlock1;
     let ids: Vec<&str> = row.iter()
         .map(|block: &TestBlock1| block.id.as_str())
         .collect();
+    assert_eq!(ids, vec!["test"; 4]);
     
     let blocks = row.clone_into_blocks();
     assert_eq!(blocks.len(), row.len());
@@ -111,6 +112,88 @@ use crate::block::TestBlock1;
     let other_ids: Vec<&str> = row.iter()
         .map(|block: &TestBlock1| block.id.as_str())
         .collect();
+    assert_eq!(other_ids, vec!["test"; 4]);
 
-    assert_eq!(ids, other_ids);
+}
+
+#[test] fn row_voids_test() {
+    let mut row = Row::default();
+    row.add_block(TestBlock1::create(&"real".to_string()));
+
+    row.offset(1);
+    assert_eq!(row.len(), 2);
+    assert!(
+        row[0].is_void() && !row[1].is_void(), 
+        "Offset should add a void at the beginning."
+    );
+
+    row.pad(1);
+    assert_eq!(row.len(), 3);
+    assert!(
+        row[2].is_void() && !row[1].is_void(), 
+        "Pad should add a void at the end."
+    );
+
+    row.offset(0);
+    assert_eq!(row.len(), 3, "Offset 0 should add 0");
+    row.offset(2);
+    assert_eq!(row.len(), 5, "Offset 2 should add 2");
+
+    row.pad(0);
+    assert_eq!(row.len(), 5, "Pad 0 should add 0");
+    row.pad(2);
+    assert_eq!(row.len(), 7, "Pad 2 should add 2");
+
+    let num_voids = row.iter()
+        .filter(|block| block.is_void())
+        .count();
+    assert_eq!(num_voids, 6, "There should be 6 voids in total.");
+
+    row.compress();
+    assert_eq!(row.len(), 1, "There should be 6 blocks removed.");
+    assert_eq!(
+        &row[0].id, 
+        "real", 
+        "Compress must preserve real."
+    );
+
+    let num_voids = row.iter()
+        .filter(|block| block.is_void())
+        .count();
+    assert_eq!(num_voids, 0, "Compress should remove voids.");
+
+    row.offset(1).pad(1);
+    row.fill_voids(&"filler".to_string());
+
+    let num_voids = row.iter()
+        .filter(|block| block.is_void())
+        .count();
+    assert_eq!(num_voids, 0, "There should be no voids unfilled.");
+    assert_eq!(
+        &row[0].id, 
+        "filler", 
+        "Offset should be replaced with filler."
+    );
+    assert_eq!(
+        &row[2].id, 
+        "filler", 
+        "Pad should be replaced with filler."
+    );
+
+    row.offset(1).pad(1);
+    row.fill_with_clones(&TestBlock1::create(&"more_filler".to_string()));
+
+    let ids: Vec<&str> = row.iter()
+        .map(|block| block.id.as_str())
+        .collect();
+    assert_eq!(ids, vec![
+        "more_filler",
+        "filler",
+        "real",
+        "filler",
+        "more_filler",
+    ]);
+
+
+    // TODO Row voids?
 }
