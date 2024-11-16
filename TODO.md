@@ -6,45 +6,34 @@
 - [ ] Errors handled (thiserror)
 - [ ] Optimization (in-place modification instead of cloning)
 - [ ] Standardize and DRY
+- [ ] Optimization (not too dry that I'm repeating checks)
 - [x] Builder chain returning &self, &mut self, etc.
 - [ ] 1-based indexing to make lengths vs. indexes easier?
 
 ----
 
 ## examples
-- [ ] How to implement blok traits & connectors for custom types
-- [ ] Build then stack,
-- [ ] Build on stack (build stack in place)
-- [ ] How to nest blok traits (ie, how to use a stack as a block)
-- [ ] Implementing block for sync and send, connecting using clones
+- [ ] Basic use demonstration
+
 ## tests
 ### block
 - [ ] additional/variable blocks
-### connect
-- [ ] connect/mod.rs
-- [ ] connection preservation during clone, move, etc.
-### row
-- [x] build/clone
-- [x] partial
-### layer
-- [ ] layer.rs
 ### stack
-- [ ] stack.rs
 
 ----
 - [ ] TODO! Needs `disconnect` method for Block trait
 - [ ] Hide "connect", "clone", and other behavior behind feats
 
 ## types
-- [ ] RowRef, LayerRef and StackRef for vector-matrix of in-place references (as opposed to clones)
 - [ ] Connect gets clone version & reference version too
-- [ ] Reduce overlap/repetition with traits? Or helper functions.
 
 ### row.rs 
 - [ ] Integration with higher types
 - [ ] Basic functions
 
 ### layer.rs 
+- [ ] clone_into_rows/set_from
+- [ ] pad x, y, row
 - [ ] rotate_90/180/270
 
 ### stack.rs 

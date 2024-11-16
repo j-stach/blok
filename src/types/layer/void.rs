@@ -94,7 +94,7 @@ impl<B: Block> Layer<B> {
     ) {
         for block in self.blocks_mut().iter_mut() {
             if block.is_void() {
-                *block = B::create(instructions.clone())
+                *block = B::create(&instructions)
             }
         }
     }
@@ -109,7 +109,7 @@ impl<B: Block> Layer<B> {
     }
 
     /// Remove all void blocks from the matrix.
-    pub fn remove_voids(&mut self) {
+    pub fn compress(&mut self) {
         let mut rows = self.clone_into_blocks();
         rows = rows.into_iter()
             .map(|row| 

@@ -51,6 +51,31 @@ impl<B: Block> Layer<B> {
         Ok(self)
     }
 
+    /// Add a block to the end of the given row.
+    pub fn add_blocks_to_row(
+        &mut self, 
+        r: usize, 
+        mut blocks: Vec<B>
+    ) -> anyhow::Result<&mut Self> {
+
+        if self.layout().len() < r {
+            return Err(anyhow::anyhow!("Row {} DNE", r)) 
+        }
+
+        let index = {
+            let mut index = 0usize;
+            for rr in 0..r {
+                index += rr
+            }
+            index
+        };
+
+        self.layout_mut()[r] += blocks.len();
+        self.blocks_mut().append(&mut blocks);
+
+        Ok(self)
+    }
+
     /// Insert a block into the given row, at the given index.
     pub fn insert_block(
         &mut self,
