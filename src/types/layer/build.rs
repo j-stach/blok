@@ -84,7 +84,9 @@ impl<B: Block> Layer<B> {
         block: B
     ) -> anyhow::Result<&mut Self> { 
         
+        // BUG
         let index = self.find_block_index(r, i);
+        // BUG
         if index.is_none() { 
             return Err(anyhow::anyhow!("Block index does not exist"))
         }

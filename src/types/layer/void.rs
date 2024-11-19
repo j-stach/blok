@@ -7,42 +7,75 @@ impl<B: Block> Layer<B> {
     /// Offset a row with void blocks.
     pub fn offset_row(
         &mut self, 
-        row: usize, 
+        r: usize, 
         offset: usize
-    ) -> anyhow::Result<()> { // TODO Error
+    ) -> anyhow::Result<&mut Self> { 
         
-        if row > self.layout().len() {
-            return Err(anyhow::anyhow!("Row {} could not be found", row))
+        if r > self.layout().len() {
+            return Err(anyhow::anyhow!("Row {} could not be found", r))
         }
 
         for _ in 0..offset {
-            self.insert_block(row, 0, B::void())?;
+            self.insert_block(r, 0, B::void())?;
         }
 
-        Ok(())
+        Ok(self)
     }
 
-    /// Offset with an empty row
-    // TBD Void block or simple imaginary row?
-    pub fn offset_x(&mut self, offset: usize) {
-        let mut layout = vec![0; offset];
+    /// Add void blocks to the end of the row.
+    pub fn pad_row(
+        &mut self,
+        r: usize,
+        pad: usize 
+    ) -> &mut Self {
+        for _ in 0..pad {
+            self.add_block_to_row(r, B::void())
+                .expect("Each row exists");
+        }
+        self
+    }
+
+    /// Offset with an empty row.
+    /// Rows contain a single void block so that they can be indexed.
+    pub fn offset_x(&mut self, offset: usize) -> &mut Self {
+        let mut layout = vec![1; offset];
         layout.append(self.layout_mut());
-        **self.layout_mut() = layout;
+        *self.layout = layout;
+
+        let mut blocks = vec![B::void()];
+        blocks.append(&mut self.blocks);
+        self.blocks = blocks;
+
+        self
     }
 
     /// Offset all rows with void blocks.
-    pub fn offset_y(&mut self, offset: usize) {
+    pub fn offset_y(&mut self, offset: usize) -> &mut Self {
         for r in 0..self.layout().len() {
             self.offset_row(r, offset)
-                .expect("Error: Layout corrupted")
+                .expect("Error: Layout corrupted");
         }
+        self
     }
 
-    //
-    // TODO
-    // pad_x
-    // pad_y
-    //
+    /// Insert empty rows at the end of the layer.
+    /// Rows contain a single void block so that they can be indexed.
+    pub fn pad_x(&mut self, pad: usize) -> &mut Self {
+        for _ in 0..pad {
+            self.new_row();
+            self.add_block(B::void());
+        }
+        self
+    }
+
+    /// Add voids to the end of each row.
+    pub fn pad_y(&mut self, pad: usize) -> &mut Self {
+        let num_rows = self.layout.len();
+        for r in 0..num_rows {
+            self.pad_row(r, pad);
+        }
+        self
+    }
 
     /// Square off the matrix to the highest row length,
     /// by inserting void blocks into the empty indices.
@@ -66,7 +99,7 @@ impl<B: Block> Layer<B> {
 
     /// Square off the matrix up to the given x and y,
     /// by inserting void blocks into the empty indices.
-    pub fn realize_volume(
+    pub fn realize_area(
         &mut self, 
         x: usize, 
         y: usize
@@ -91,25 +124,27 @@ impl<B: Block> Layer<B> {
     pub fn fill_voids(
         &mut self, 
         instructions: &B::CreationInstructions
-    ) {
+    ) -> &mut Self {
         for block in self.blocks_mut().iter_mut() {
             if block.is_void() {
                 *block = B::create(&instructions)
             }
         }
+        self
     }
 
     /// Replace all void blocks with ones cloned from a prototype.
-    pub fn fill_with_clones(&mut self, block: &B) {
+    pub fn fill_with_clones(&mut self, block: &B) -> &mut Self {
         for b in self.blocks_mut().iter_mut() {
             if b.is_void() {
                 *b = block.clone()
             }
         }
+        self
     }
 
     /// Remove all void blocks from the matrix.
-    pub fn compress(&mut self) {
+    pub fn compress(&mut self) -> &mut Self {
         let mut rows = self.clone_into_blocks();
         rows = rows.into_iter()
             .map(|row| 
@@ -119,7 +154,11 @@ impl<B: Block> Layer<B> {
             )
             .collect();
 
-        self.set_from_blocks(rows)
+        // TODO Remove empty rows
+
+        self.set_from_blocks(rows);
+
+        self
     }
 
 }

@@ -144,15 +144,15 @@ use crate::block::TestBlock1;
 
     layer.offset_y(1);
 
-    //layer.pad_x(1);
+    layer.pad_x(1);
 
-    //layer.pad_y(1);
+    layer.pad_y(1);
 
     layer.fill_voids(&"a".to_string());
 
-    layer.offset_row(0, 1);
+    layer.offset_row(0, 1).expect("Offset first row by 1");
 
-    //layer.pad_row(0, 1);
+    layer.pad_row(0, 1);
 
     let proto = TestBlock1::create(&"b".to_string());
     layer.fill_with_clones(&proto);

@@ -27,7 +27,7 @@ impl Layout {
 
     /// Find the block index for the start of a row.
     pub fn row_start(&self, row: usize) -> Option<usize> {
-        if *self.get(row)? == 0 { return None };
+        if self.get(row)? == &0 { return None };
 
         let mut start = 0usize;
         for l in &self[0..row] {

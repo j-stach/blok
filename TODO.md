@@ -2,10 +2,10 @@
 # blok TODO:
 
 ## General code
-- [ ] Cleaning
+- [ ] Cleaning & refactor old code
 - [ ] Errors handled (thiserror)
 - [ ] Optimization (in-place modification instead of cloning)
-- [ ] Standardize and DRY
+- [ ] Standardize and DRY, more utility functions
 - [ ] Optimization (not too dry that I'm repeating checks)
 - [x] Builder chain returning &self, &mut self, etc.
 - [ ] 1-based indexing to make lengths vs. indexes easier?

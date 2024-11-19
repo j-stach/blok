@@ -11,6 +11,7 @@ readme = "README.md"
 
 
 [dependencies]
+anal-eyes = "0.0.1"
 anyhow = "1.0.82"
 derive_more = "0.99.17"
 rand = "0.8.5"
