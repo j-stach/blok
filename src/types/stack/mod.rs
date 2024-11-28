@@ -1,10 +1,10 @@
 
 pub mod build;
+pub mod void;
 pub mod partial;
 pub mod clone;
 //pub mod connect;
 //pub mod transform;
-//pub mod void;
 
 use crate::{ Block, Layer, Layout };
 
@@ -21,6 +21,11 @@ pub struct Stack<B: Block> {
 
 /// Field access methods:
 impl<B: Block> Stack<B> {
+
+    /// Create an empty stack.
+    pub fn new() -> Self {
+        Self::default()
+    }
 
     /// Get a reference to the list of layouts for the stack layers.
     pub fn layouts(&self) -> &Vec<Layout> {

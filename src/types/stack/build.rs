@@ -148,6 +148,7 @@ impl<B: Block> Stack<B> {
         &mut self,
         rows: Vec<Row<B>>
     ) -> &mut Self {
+
         for row in rows.into_iter() {
             self.add_row(row);
         }
@@ -177,12 +178,17 @@ impl<B: Block> Stack<B> {
         Ok(self)
     }
 
+    /// Insert a row to the given layer, at the given index.
+    pub fn insert_row(
+        &mut self, 
+        l: usize,
+        r: usize,
+        row: Row<B>
+    ) -> anyhow::Result<&mut Self> {
+        
+        Ok(self)
 
-    //
-    // TODO:
-    // insert_row
-    //
-
+    }
 
     /// Allocate a new layer on the stack.
     pub fn new_layer(&mut self) -> &mut Self {

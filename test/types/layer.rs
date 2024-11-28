@@ -2,6 +2,12 @@
 use blok::{ Block, Row, Layout, layout, Layer };
 use crate::block::TestBlock1;
 
+//
+// TODO
+// Documentation comments
+// Assert statements needed for some tests
+// 
+
 // new layer
 #[test] fn new_layer_test() {
 
@@ -49,7 +55,7 @@ use crate::block::TestBlock1;
 }
 
 // build
-#[test] fn build_layer() {
+#[test] fn build_layer_test() {
 
     let mut layer = Layer::<TestBlock1>::default();
     let new_block = |id: &str| TestBlock1::create(&id.to_string());

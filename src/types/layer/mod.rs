@@ -21,6 +21,11 @@ pub struct Layer<B: Block> {
 /// Field access methods:
 impl<B: Block> Layer<B> {
 
+    /// Create an empty layer.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Get a reference to the blocks of the layer.
     pub fn blocks(&self) -> &Vec<B> { 
         &self.blocks 
