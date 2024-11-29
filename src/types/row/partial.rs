@@ -51,4 +51,24 @@ impl<B: Block> Row<B> {
         Some(blocks)
     }
 
+    /// Get a vector of references to all blocks.
+    /// Returns None if the range does not exist in the row.
+    /// Use this for operations on a collection of blocks, not for building row structure.
+    /// (Adding to this vector will not add blocks to the row.)
+    pub fn get_all_ref(&self) -> Option<Vec<&B>> {
+        if self.len() == 0 { return None }
+        let row_ref = self.iter().collect();
+        Some(row_ref)
+    }
+
+    /// Get a vector of mutable references to all blocks.
+    /// Returns None if the range does not exist in the row.
+    /// Use this for operations on a collection of blocks, not for building row structure.
+    /// (Adding to this vector will not add blocks to the row.)
+    pub fn get_all_mut(&mut self) -> Option<Vec<&mut B>> {
+        if self.len() == 0 { return None }
+        let row_ref = self.iter_mut().collect();
+        Some(row_ref)
+    }
+
 }

@@ -10,8 +10,7 @@ use crate::{ Block, Row, Layer, Stack, Aligner };
 pub fn row_connection<'b, B: Block>(
     row1: &mut Vec<&'b mut B>, 
     row2: &mut Vec<&'b mut B>, 
-    block_align: Aligner<&'b mut B>, // Used to be Alignment (for performance), 
-                                     // but it complicated types and errors too much
+    block_align: Aligner<&'b mut B>, 
     mut instructions: Vec<B::ConnectionInstructions>
 ) {
     let alignment = block_align(row1, row2);
@@ -38,7 +37,27 @@ pub fn row_connection<'b, B: Block>(
 }
 
 impl<B: Block> Row<B> {
-    //
+
+    /// Method version of row_connection
+    pub fn connect<'b>(
+        &'b mut self,
+        mut other: &'b mut Row<B>,
+        block_align: Aligner<&'b mut B>, 
+        mut instructions: Vec<B::ConnectionInstructions>
+    ) -> anyhow::Result<()> {
+
+        let this = self.get_all_mut();
+        let other = other.get_all_mut();
+        if this.is_none() || other.is_none() {
+            return Err(anyhow::anyhow!("Could not reference rows"))
+        }
+
+        let (mut this, mut other) = (this.unwrap(), other.unwrap());
+        row_connection(&mut this, &mut other, block_align, instructions);
+
+        Ok(())
+    }
+
 }
 
 
@@ -77,7 +96,8 @@ pub fn layer_connection<'b, B: Block>(
 }
 
 impl<B: Block> Layer<B> {
-    //
+    // TODO connect method
+    // and get_all_mut
 }
 
 
@@ -117,31 +137,10 @@ pub fn stack_connection<'b, B: Block>(
 }
 
 impl<B: Block> Stack<B> {
-    //
+
+    // TODO connect method
+    // and get_all_mut
 }
 
 
 
-
-/*
-// TODO Refine this to be more flexible.
-pub fn autoconnect_stack_uniformly<B: Block, S: Stack<B>>(
-    stack: &mut S, 
-    align: Aligner<B>, 
-    instructions: Vec<B::ConnectionInstructions>
-) {
-    let layers = stack.clone_into_layers();
-    let mut connected = Vec::new();
-
-    let mut current = layers[0].clone();
-    for l in 1..layers.len() - 1 {
-        let mut next = layers[l].clone();
-        interconnect_corresponding_rows(&mut current, &mut next, align, instructions.clone());
-        connected.push(current);
-        current = next
-    }
-
-    stack.set_from_layers(connected)
-}
-
-*/

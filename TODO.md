@@ -2,9 +2,9 @@
 # blok TODO:
 
 ## General code
-- [ ] Cleaning & refactor old code
+- [x] Cleaning & refactor old code
 - [ ] Errors handled (thiserror)
-- [ ] Optimization (in-place modification instead of cloning)
+- [x] Optimization (in-place modification instead of cloning)
 - [ ] Standardize and DRY, more utility functions
 - [ ] Optimization (not too dry that I'm repeating checks)
 - [x] Builder chain returning &self, &mut self, etc.
@@ -25,36 +25,24 @@
 - [ ] Hide "connect", "clone", and other behavior behind feats
 
 ## types
-- [ ] Connect gets clone version & reference version too
+- [x] Convert connect to reference version
 
 ### row.rs 
-- [ ] Integration with higher types
-- [ ] Basic functions
+- [x] Integration with higher types
+- [x] Basic functions
 
 ### layer.rs 
-- [ ] clone_into_rows/set_from
-- [ ] pad x, y, row
+- [x] clone_into_rows/set_from
+- [x] pad x, y, row
 - [ ] rotate_90/180/270
 
 ### stack.rs 
-- [ ] set_layer 
+- [x] set_layer 
 - [ ] offset_xyz 
 - [ ] collapse 
-- [ ] fusion/merge_overlap 
-- [ ] realize_volume
+- [x] realize_volume
 - [ ] Vertical slices for partial ref
-- [ ] insert_row
-
-## order 
-### layout
-- [ ] empty_row
-- [ ] initialize
+- [x] insert_row
 
 ----
-
-## docs
-- Builder arguments follow add(where, what) schema ("Little endian?")
-- Functional build process, returns error or self 
-- Partial references return None when the index DNE
-- Alignments create a connection "schedule" using indexes
 
