@@ -15,7 +15,7 @@ impl Alignment {
 }
 
 
-/// Function type for generating an Alignment.
+/// This is a function that generates an Alignment.
 pub type Aligner<T> = fn(&Vec<T>, &Vec<T>) -> Alignment;
 
 /// Here are some basic Aligners. 
@@ -23,9 +23,9 @@ pub type Aligner<T> = fn(&Vec<T>, &Vec<T>) -> Alignment;
 impl Alignment {
 
     /// Align corresponding indices.
-    pub fn corresponding<B>(
-        row1: &Vec<B>, 
-        row2: &Vec<B>
+    pub fn corresponding<T>(
+        row1: &Vec<T>, 
+        row2: &Vec<T>
     ) -> Self {
 
         let r1 = row1.len();
@@ -41,9 +41,9 @@ impl Alignment {
     }
 
     /// Align the elements end-to-end.
-    pub fn reversed<B>(
-        row1: &Vec<B>, 
-        row2: &Vec<B>
+    pub fn reversed<T>(
+        row1: &Vec<T>, 
+        row2: &Vec<T>
     ) -> Self {
 
         let r1 = row1.len();
@@ -59,9 +59,9 @@ impl Alignment {
     }
 
     /// Align a random element from the first row to a random element in the second.
-    pub fn random<B>(
-        row1: &Vec<B>, 
-        row2: &Vec<B>
+    pub fn random<T>(
+        row1: &Vec<T>, 
+        row2: &Vec<T>
     ) -> Self {
 
         let r1 = row1.len();
@@ -90,9 +90,9 @@ impl Alignment {
     }
 
     /// Align each element in one row to each element in the other.
-    pub fn dense<B>(
-        row1: &Vec<B>, 
-        row2: &Vec<B>
+    pub fn dense<T>(
+        row1: &Vec<T>, 
+        row2: &Vec<T>
     ) -> Self {
 
         let r1 = row1.len();
@@ -111,9 +111,9 @@ impl Alignment {
     /// Centers the elignment as much as possible.
     /// Won't be perfect when lengths are opposite parity.
     /// Follows rules for usize division (round down).
-    pub fn centered<B>(
-        row1: &Vec<B>, 
-        row2: &Vec<B>
+    pub fn centered<T>(
+        row1: &Vec<T>, 
+        row2: &Vec<T>
     ) -> Self {
 
         let r1 = row1.len();
@@ -140,5 +140,15 @@ impl Alignment {
 
         Self::wrap(vec)
     }
+
+    /// Returns an empty alignment.
+    /// For when you do not want to make connections.
+    pub fn none<T>(
+        row1: &Vec<T>, 
+        row2: &Vec<T>
+    ) -> Self {
+        Self::default()
+    }
+
 }
 

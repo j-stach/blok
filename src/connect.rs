@@ -1,18 +1,20 @@
 
-use crate::types::*;
-use crate::Aligner;
+use crate::{ Block, Row, Layer, Stack, Aligner };
+
+// TODO Need a convenient way to map alignments into connection instructions 
 
 
-/// Connect two rows of blocks according to the parameters given.
+/// Connect two row refs of blocks according to the parameters given.
 /// If the number of instructions is fewer than connections to perform,
 /// it will repeat the last instruction given for the remaining connections.
-pub fn row_connection<B: Block>(
-    row1: &mut Vec<B>, 
-    row2: &mut Vec<B>, 
-    align: Aligner<B>, // Used to be Alignment (for performance), but it complicated Errors
+pub fn row_connection<'b, B: Block>(
+    row1: &mut Vec<&'b mut B>, 
+    row2: &mut Vec<&'b mut B>, 
+    block_align: Aligner<&'b mut B>, // Used to be Alignment (for performance), 
+                                     // but it complicated types and errors too much
     mut instructions: Vec<B::ConnectionInstructions>
 ) {
-    let alignment = align(row1, row2);
+    let alignment = block_align(row1, row2);
 
     let last_instr = if let Some(instr) = instructions.last() {
         instr.clone()
@@ -35,22 +37,23 @@ pub fn row_connection<B: Block>(
     }
 }
 
-/// Connect two layers using row_connection.
+impl<B: Block> Row<B> {
+    //
+}
+
+
+/// Connect two layer refs using row_connection.
 /// If the number of instruction lists is fewer than the number of rows to be connected,
 /// it will repeat the last instruction given for the remaining connections.
-pub fn layer_connection<B: Block>(
-    layer1: &mut Layer<B>, 
-    layer2: &mut Layer<B>, 
-    row_align: Aligner<Vec<B>>,
-    block_align: Aligner<B>, 
+pub fn layer_connection<'b, B: Block>(
+    layer1: &mut Vec<Vec<&'b mut B>>, 
+    layer2: &mut Vec<Vec<&'b mut B>>, 
+    row_align: Aligner<Vec<&'b mut B>>,
+    block_align: Aligner<&'b mut B>, 
     mut instructions: Vec<Vec<B::ConnectionInstructions>>
 ) {
 
-    // TODO Connect without clone
-    let mut rows1 = layer1.clone_into_blocks();
-    let mut rows2 = layer2.clone_into_blocks();
-
-    let alignment = row_align(&rows1, &rows2);
+    let alignment = row_align(&layer1, &layer2);
 
     let last_instr = if let Some(instr) = instructions.last() {
         instr.clone()
@@ -64,37 +67,33 @@ pub fn layer_connection<B: Block>(
 
     let mut step = 0usize;
     for pair in alignment.iter() {
-        if rows1.len() < pair.0 && rows2.len() < pair.1 {
-            let row1 = &mut rows1[pair.0];
-            let row2 = &mut rows2[pair.1];
+        if layer1.len() < pair.0 && layer2.len() < pair.1 {
+            let row1 = &mut layer1[pair.0];
+            let row2 = &mut layer2[pair.1];
             row_connection(row1, row2, block_align, instructions[step].clone());
         } 
         step += 1;
     }
+}
 
-    // TODO Connect without clone
-    layer1.set_from_blocks(rows1);
-    layer2.set_from_blocks(rows2);
+impl<B: Block> Layer<B> {
+    //
 }
 
 
-/// Connect two stacks using layer_connection.
+/// Connect two stack refs using layer_connection.
 /// If the number of instruction lists is fewer than the number of rows to be connected,
 /// it will repeat the last instruction given for the remaining connections.
-pub fn stack_connection<B: Block, S: Stack<B>>(
-    stack1: &mut S, 
-    stack2: &mut S, 
-    layer_align: Aligner<Layer<B>>,
-    row_align: Aligner<Vec<B>>,
-    block_align: Aligner<B>, 
+pub fn stack_connection<'b, B: Block>(
+    stack1: &mut Vec<Vec<Vec<&'b mut B>>>, 
+    stack2: &mut Vec<Vec<Vec<&'b mut B>>>, 
+    layer_align: Aligner<Vec<Vec<&'b mut B>>>,
+    row_align: Aligner<Vec<&'b mut B>>,
+    block_align: Aligner<&'b mut B>, 
     mut instructions: Vec<Vec<Vec<B::ConnectionInstructions>>>
 ) {
 
-    // TODO Connect without clone
-    let mut layers1 = stack1.clone_into_layers();
-    let mut layers2 = stack2.clone_into_layers();
-
-    let alignment = layer_align(&layers1, &layers2);
+    let alignment = layer_align(&stack1, &stack2);
 
     let last_instr = if let Some(instr) = instructions.last() {
         instr.clone()
@@ -108,18 +107,21 @@ pub fn stack_connection<B: Block, S: Stack<B>>(
 
     let mut step = 0usize;
     for pair in alignment.iter() {
-        if layers1.len() < pair.0 && layers2.len() < pair.1 {
-            let layer1 = &mut layers1[pair.0];
-            let layer2 = &mut layers2[pair.1];
+        if stack1.len() < pair.0 && stack2.len() < pair.1 {
+            let layer1 = &mut stack1[pair.0];
+            let layer2 = &mut stack2[pair.1];
             layer_connection(layer1, layer2, row_align, block_align, instructions[step].clone());
         } 
         step += 1;
     }
-
-    // TODO Connect without clone
-    stack1.set_from_layers(layers1);
-    stack2.set_from_layers(layers2);
 }
+
+impl<B: Block> Stack<B> {
+    //
+}
+
+
+
 
 /*
 // TODO Refine this to be more flexible.

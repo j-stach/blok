@@ -56,3 +56,5 @@
 - Builder arguments follow add(where, what) schema ("Little endian?")
 - Functional build process, returns error or self 
 - Partial references return None when the index DNE
+- Alignments create a connection "schedule" using indexes
+
