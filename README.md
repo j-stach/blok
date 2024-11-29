@@ -11,6 +11,7 @@ Traits for graphlike 3D arrays. (Work in progress.) <br>
 - Functional build process, returns error or self 
 - Partial references return None when the index DNE
 - Alignments create a connection "schedule" using indexes
+- During connections, use the `'c` lifetime for references
 
 
 ## Future directions

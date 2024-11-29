@@ -3,6 +3,8 @@ use crate::{ Block, Row, Layer, Stack, Aligner };
 
 // TODO Need a convenient way to map alignments into connection instructions 
 
+// TBD Move these back?
+
 
 /// Connect two row refs of blocks according to the parameters given.
 /// If the number of instructions is fewer than connections to perform,
