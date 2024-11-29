@@ -7,10 +7,10 @@ use crate::{ Block, Row, Layer, Stack, Aligner };
 /// Connect two row refs of blocks according to the parameters given.
 /// If the number of instructions is fewer than connections to perform,
 /// it will repeat the last instruction given for the remaining connections.
-pub fn row_connection<'b, B: Block>(
-    row1: &mut Vec<&'b mut B>, 
-    row2: &mut Vec<&'b mut B>, 
-    block_align: Aligner<&'b mut B>, 
+pub fn row_connection<'c, B: Block>(
+    row1: &mut Vec<&'c mut B>, 
+    row2: &mut Vec<&'c mut B>, 
+    block_align: Aligner<&'c mut B>, 
     mut instructions: Vec<B::ConnectionInstructions>
 ) {
     let alignment = block_align(row1, row2);
@@ -39,10 +39,10 @@ pub fn row_connection<'b, B: Block>(
 impl<B: Block> Row<B> {
 
     /// Method version of row_connection
-    pub fn connect<'b>(
-        &'b mut self,
-        mut other: &'b mut Row<B>,
-        block_align: Aligner<&'b mut B>, 
+    pub fn connect<'c>(
+        &'c mut self,
+        mut other: &'c mut Row<B>,
+        block_align: Aligner<&'c mut B>, 
         mut instructions: Vec<B::ConnectionInstructions>
     ) -> anyhow::Result<()> {
 
@@ -64,11 +64,11 @@ impl<B: Block> Row<B> {
 /// Connect two layer refs using row_connection.
 /// If the number of instruction lists is fewer than the number of rows to be connected,
 /// it will repeat the last instruction given for the remaining connections.
-pub fn layer_connection<'b, B: Block>(
-    layer1: &mut Vec<Vec<&'b mut B>>, 
-    layer2: &mut Vec<Vec<&'b mut B>>, 
-    row_align: Aligner<Vec<&'b mut B>>,
-    block_align: Aligner<&'b mut B>, 
+pub fn layer_connection<'c, B: Block>(
+    layer1: &mut Vec<Vec<&'c mut B>>, 
+    layer2: &mut Vec<Vec<&'c mut B>>, 
+    row_align: Aligner<Vec<&'c mut B>>,
+    block_align: Aligner<&'c mut B>, 
     mut instructions: Vec<Vec<B::ConnectionInstructions>>
 ) {
 
@@ -104,12 +104,12 @@ impl<B: Block> Layer<B> {
 /// Connect two stack refs using layer_connection.
 /// If the number of instruction lists is fewer than the number of rows to be connected,
 /// it will repeat the last instruction given for the remaining connections.
-pub fn stack_connection<'b, B: Block>(
-    stack1: &mut Vec<Vec<Vec<&'b mut B>>>, 
-    stack2: &mut Vec<Vec<Vec<&'b mut B>>>, 
-    layer_align: Aligner<Vec<Vec<&'b mut B>>>,
-    row_align: Aligner<Vec<&'b mut B>>,
-    block_align: Aligner<&'b mut B>, 
+pub fn stack_connection<'c, B: Block>(
+    stack1: &mut Vec<Vec<Vec<&'c mut B>>>, 
+    stack2: &mut Vec<Vec<Vec<&'c mut B>>>, 
+    layer_align: Aligner<Vec<Vec<&'c mut B>>>,
+    row_align: Aligner<Vec<&'c mut B>>,
+    block_align: Aligner<&'c mut B>, 
     mut instructions: Vec<Vec<Vec<B::ConnectionInstructions>>>
 ) {
 
