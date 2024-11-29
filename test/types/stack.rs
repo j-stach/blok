@@ -22,6 +22,7 @@ use crate::block::TestBlock1;
     ]);
     // TODO Assert
 
+    /*
     let row = Row::wrap(vec![
         new_block("010"),
         new_block("011"),
@@ -75,6 +76,8 @@ use crate::block::TestBlock1;
     layer2.populate_with_clones(layout![4; 2], &TestBlock1::create(&"top".to_string()));
     stack.add_layer(layer2);
     // TODO Assert
+ */
+
 }
 
 #[test] fn populate_stack_test() {

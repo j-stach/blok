@@ -7,10 +7,18 @@ Traits for graphlike 3D arrays. (Work in progress.) <br>
 
 
 ## Usage
+### Building a stack
 - Builder arguments follow add(where, what) schema ("Little endian?")
 - Functional build process, returns error or self 
-- Partial references return None when the index DNE
-- Alignments create a connection "schedule" using indexes
+- Layouts and blocks 
+### Partial references
+- Partial references return None when the index or range DNE
+### Transformations
+- Transformations reorganize blocks by cloning, 
+modifying, and resetting the stack in place
+### Connecting blocks
+- Alignments create a connection "schedule" using indexes, 
+for layer row and block
 - During connections, use the `'c` lifetime for references
 
 

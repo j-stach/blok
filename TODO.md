@@ -18,10 +18,7 @@
 ## tests
 ### block
 - [ ] additional/variable blocks
-### stack
-
-----
-- [ ] TODO! Needs `disconnect` method for Block trait
+- [ ] `disconnect` method for Block trait
 - [ ] Hide "connect", "clone", and other behavior behind feats
 
 ## types
