@@ -1,5 +1,11 @@
 
-# blok TODO:
+# blok 0.0.2 TODO:
+
+- [ ] Connection methods 
+- [ ] README
+- [ ] example 1
+
+----
 
 ## General code
 - [x] Cleaning & refactor old code
@@ -20,6 +26,8 @@
 - [ ] additional/variable blocks
 - [ ] `disconnect` method for Block trait
 - [ ] Hide "connect", "clone", and other behavior behind feats
+
+----
 
 ## types
 - [x] Convert connect to reference version

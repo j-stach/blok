@@ -7,6 +7,30 @@ Traits for graphlike 3D arrays. (Work in progress.) <br>
 
 
 ## Usage
+### Implementing the Block trait 
+```
+#[derive(Clone)]
+struct MyBlock {
+    data: u32
+}
+
+impl Block for MyBlock {
+    //
+}
+```
+### Implementing the Block trait with connections 
+```
+#[derive(Clone)]
+struct NodeBlock {
+    id: String,
+    children: Vec<Arc<Mutex<NodeBlock>>>
+}
+
+impl Block for MyBlock {
+    //
+}
+```
+
 ### Building a stack
 - Builder arguments follow add(where, what) schema ("Little endian?")
 - Functional build process, returns error or self 
