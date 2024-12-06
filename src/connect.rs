@@ -40,12 +40,12 @@ pub fn row_connection<'c, B: Block>(
 
 impl<B: Block> Row<B> {
 
-    /// Method version of row_connection
+    /// Method version of row_connection.
     pub fn connect<'c>(
         &'c mut self,
-        mut other: &'c mut Row<B>,
+        other: &'c mut Self,
         block_align: Aligner<&'c mut B>, 
-        mut instructions: Vec<B::ConnectionInstructions>
+        instructions: Vec<B::ConnectionInstructions>
     ) -> anyhow::Result<()> {
 
         let this = self.get_all_mut();
@@ -98,8 +98,34 @@ pub fn layer_connection<'c, B: Block>(
 }
 
 impl<B: Block> Layer<B> {
-    // TODO connect method
-    // and get_all_mut
+
+    /// Method version of layer_connection.
+    pub fn connect<'c>(
+        &'c mut self, 
+        other: &'c mut Self, 
+        row_align: Aligner<Vec<&'c mut B>>,
+        block_align: Aligner<&'c mut B>, 
+        instructions: Vec<Vec<B::ConnectionInstructions>>
+    ) -> anyhow::Result<()> {
+
+        let this = self.get_all_mut();
+        let other = other.get_all_mut();
+        if this.is_none() || other.is_none() {
+            return Err(anyhow::anyhow!("Could not reference layers"))
+        }
+
+        let (mut this, mut other) = (this.unwrap(), other.unwrap());
+        layer_connection(
+            &mut this, 
+            &mut other, 
+            row_align,
+            block_align, 
+            instructions
+        );
+
+        Ok(())
+    }
+
 }
 
 
@@ -140,8 +166,35 @@ pub fn stack_connection<'c, B: Block>(
 
 impl<B: Block> Stack<B> {
 
-    // TODO connect method
-    // and get_all_mut
+    /// Method version of stack_connection.
+    pub fn connect<'c>(
+        &'c mut self, 
+        other: &'c mut Self, 
+        layer_align: Aligner<Vec<Vec<&'c mut B>>>,
+        row_align: Aligner<Vec<&'c mut B>>,
+        block_align: Aligner<&'c mut B>, 
+        instructions: Vec<Vec<Vec<B::ConnectionInstructions>>>
+    ) -> anyhow::Result<()> {
+
+        let this = self.get_all_mut();
+        let other = other.get_all_mut();
+        if this.is_none() || other.is_none() {
+            return Err(anyhow::anyhow!("Could not reference stacks"))
+        }
+
+        let (mut this, mut other) = (this.unwrap(), other.unwrap());
+        stack_connection(
+            &mut this, 
+            &mut other, 
+            layer_align,
+            row_align,
+            block_align, 
+            instructions
+        );
+
+        Ok(())
+    }
+
 }
 
 

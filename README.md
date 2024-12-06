@@ -5,6 +5,10 @@
 Traits for graphlike 3D arrays. (Work in progress.) <br>
 [Documentation](https://docs.rs/blok/latest/blok/)
 
+Still a work in-progress.
+For 0.0.3:
+- [ ] Needs error types
+
 
 ## Usage
 ### Implementing the Block trait 

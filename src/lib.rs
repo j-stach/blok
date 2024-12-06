@@ -11,5 +11,4 @@ pub mod types;
 pub use types::{ Row, Layer, Stack };
 
 pub mod connect;
-// pub use connect::*;
 

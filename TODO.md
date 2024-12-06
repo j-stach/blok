@@ -1,7 +1,7 @@
 
 # blok 0.0.2 TODO:
 
-- [ ] Connection methods 
+- [x] Connection methods 
 - [ ] README
 - [ ] example 1
 

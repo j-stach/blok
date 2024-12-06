@@ -266,5 +266,68 @@ impl<B: Block> Stack<B> {
         Some(rows)
     }
 
+    /// Get a matrix of references to all blocks.
+    /// Returns None if the stack is empty.
+    /// Use this for operations on a collection of blocks, not for building stack structure.
+    /// (Adding to this vector will not add blocks to the stack.)
+    pub fn get_all_ref(&mut self) -> Option<Vec<Vec<Vec<&B>>>> {
+        if self.layouts.len() == 0 { return None }
+
+        let mut stack_ref = Vec::new();
+        let mut blocks_ref: Vec<_> = self.blocks.iter().collect();
+
+        for layout in self.layouts.iter() {
+
+            let mut layer_ref = Vec::new();
+
+            let tail = blocks_ref.split_off(layout.total()); // DEBUG?
+            let mut layer_blocks_ref = blocks_ref;
+            blocks_ref = tail;
+
+            for r in layout.iter() {
+                let tail = layer_blocks_ref.split_off(*r); // DEBUG?
+                layer_ref.push(layer_blocks_ref);
+                layer_blocks_ref = tail;
+            }
+
+            stack_ref.push(layer_ref)
+        
+        }
+
+        Some(stack_ref)
+    }
+
+    /// Get a matrix of mutable references to all blocks.
+    /// Returns None if the stack is empty.
+    /// Use this for operations on a collection of blocks, not for building stack structure.
+    /// (Adding to this vector will not add blocks to the stack.)
+    pub fn get_all_mut(&mut self) -> Option<Vec<Vec<Vec<&mut B>>>> {
+        if self.layouts.len() == 0 { return None }
+
+        let mut stack_ref = Vec::new();
+        let mut blocks_ref: Vec<_> = self.blocks.iter_mut().collect();
+
+        for layout in self.layouts.iter() {
+
+            let mut layer_ref = Vec::new();
+
+            let tail = blocks_ref.split_off(layout.total()); // DEBUG?
+            let mut layer_blocks_ref = blocks_ref;
+            blocks_ref = tail;
+
+            for r in layout.iter() {
+                let tail = layer_blocks_ref.split_off(*r); // DEBUG?
+                layer_ref.push(layer_blocks_ref);
+                layer_blocks_ref = tail;
+            }
+
+            stack_ref.push(layer_ref)
+        
+        }
+
+        Some(stack_ref)
+    }
+
+
 }
 
