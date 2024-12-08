@@ -270,7 +270,7 @@ impl<B: Block> Stack<B> {
     /// Returns None if the stack is empty.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
-    pub fn get_all_ref(&mut self) -> Option<Vec<Vec<Vec<&B>>>> {
+    pub fn get_all_ref(&self) -> Option<Vec<Vec<Vec<&B>>>> {
         if self.layouts.len() == 0 { return None }
 
         let mut stack_ref = Vec::new();
