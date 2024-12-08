@@ -86,6 +86,8 @@ fn build_cube() -> Stack<MyBlock> {
 
     // Rows can be inserted into a specific index in the layer.
     // Returns an error if the layer contains fewer rows then the value given. 
+
+    // DEBUG: THIS FAILS HERE AND IN TESTS
     base_layer.insert_row(2, row_2)
         .expect("Should insert row_2 before the previously-added row.");
 
@@ -226,7 +228,44 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
 fn main() {
     let cube_stack = build_cube();
     let quick_cube = build_cube_quickly();
+
+    cube_stack.get_all_ref()
+        .unwrap()
+        .into_iter()
+        .enumerate()
+        .for_each(|(l, layer_ref)| {
+            layer_ref.into_iter()
+                .enumerate()
+                .for_each(|(r, row_ref)| {
+                    row_ref.into_iter()
+                        .enumerate()
+                        .for_each(|(b, block_ref)| {
+                            let quick_block_ref = quick_cube.get_block_ref(l, r, b)
+                                .expect("Should find the corresponding block.");
+                            assert_eq!(block_ref.id, quick_block_ref.id);
+                        });
+                });
+        });
+
     let pyramid_scene = build_pyramid(7);
+
+    let mut stone_counts: Vec<usize> = 
+        pyramid_scene.get_all_ref()
+            .unwrap()
+            .into_iter()
+            .map(|layer| {
+                layer.iter()
+                    .map(|row| {
+                        row.iter()
+                            .filter(|block| block.id == "Stone")
+                            .count()
+                    })
+                    .sum()
+            })
+            .collect();
+
+    assert_eq!(stone_counts, vec![7^2, 5^2, 3^2, 1]);
+            
 
     // TODO Assert and partial refs
 
