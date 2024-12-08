@@ -12,8 +12,16 @@ pub trait Block: Clone + Default {
     /// Define the process for constructing a new block.
     fn create(instructions: &Self::CreationInstructions) -> Self;
 
-    /// Define the process for connecting blocks.
-    fn connect(&mut self, other: &mut Self, instructions: &Self::ConnectionInstructions);
+    /// Optional: Define the process for connecting blocks.
+    /// Default behavior is to do nothing.
+    // TBD May make connections a trait extension.
+    fn connect(
+        &mut self, 
+        other: &mut Self, 
+        instructions: &Self::ConnectionInstructions
+    ) {
+        // Do nothing
+    }
 
     /// Create a block that represents empty space.
     fn void() -> Self;

@@ -19,6 +19,11 @@ pub struct Row<B: Block> {
 
 impl<B: Block> Row<B> {
 
+    /// Creates an empty row upon which to build.
+    pub fn new() -> Self {
+        Self::default()
+    }
+
     /// Wraps a simple vec of blocks into a formal Row type.
     pub fn wrap(blocks: Vec<B>) -> Self {
         Row { blocks }
