@@ -2,8 +2,9 @@
 # blok 0.0.2 TODO:
 
 - [x] Connection methods 
-- [ ] README
+- [x] README
 - [ ] example 1
+- [ ] cargo update
 
 ----
 
@@ -19,29 +20,34 @@
 ----
 
 ## examples
-- [ ] Basic use demonstration
+- [x] Basic use demonstration
+- [ ] Transformations 
+- [ ] Connections
 
 ## tests
-### block
 - [ ] additional/variable blocks
-- [ ] `disconnect` method for Block trait
-- [ ] Hide "connect", "clone", and other behavior behind feats
 
 ----
+
+## block
+- [ ] `disconnect` method for Block trait to allow remove
+- [ ] `remove`
+- [ ] Hide "connect", "clone", and other behavior behind feats
+- [ ] CreationInstruction factories
 
 ## types
 - [x] Convert connect to reference version
 
-### row.rs 
+### row 
 - [x] Integration with higher types
 - [x] Basic functions
 
-### layer.rs 
+### layer 
 - [x] clone_into_rows/set_from
 - [x] pad x, y, row
 - [ ] rotate_90/180/270
 
-### stack.rs 
+### stack 
 - [x] set_layer 
 - [ ] offset_xyz 
 - [ ] collapse 
