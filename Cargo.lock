@@ -3,17 +3,6 @@
 version = 3
 
 [[package]]
-name = "anal-eyes"
-version = "0.0.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "124cfd7a9bbe43576c4c156779b6423e7c36fb046305604275a2dc1d2ea952b1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.60",
-]
-
-[[package]]
 name = "anyhow"
 version = "1.0.82"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -23,7 +12,6 @@ checksum = "f538837af36e6f6a9be0faa67f9a314f8119e4e4b5867c6ab40ed60360142519"
 name = "blok"
 version = "0.0.2"
 dependencies = [
- "anal-eyes",
  "anyhow",
  "derive_more",
  "rand",

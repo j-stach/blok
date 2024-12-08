@@ -1,7 +1,7 @@
 
 [package]
 name = "blok"
-description = "3D arrays that matter"
+description = "Traits and generics for graphlike 3D arrays"
 authors = ["j-stach"]
 version = "0.0.2"
 edition = "2021"
@@ -11,29 +11,13 @@ readme = "README.md"
 
 
 [dependencies]
-anal-eyes = "0.0.1"
 anyhow = "1.0.82"
 derive_more = "0.99.17"
 rand = "0.8.5"
 serde = { version = "1.0.200", features = ["derive"] }
 
 
-[dev-dependencies]
-anal-eyes = "0.0.1"
-
 [[test]]
 name = "tests"
 path = "test/mod.rs"
 
-#[[test]]
-#name = "layout_test"
-#path = "test/order/layout.rs"
-#
-#[[test]]
-#name = "block_test_1"
-#path = "test/block/block1.rs"
-#
-#[[test]]
-#name = "row_test"
-#path = "test/types/row/row.rs"
-#

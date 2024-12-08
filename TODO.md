@@ -3,7 +3,11 @@
 
 - [x] Connection methods 
 - [x] README
-- [ ] example 1
+- [x] example 1
+- [ ] debug tests and example: Indexing errors
+- [x] clean up Cargo.toml
+- [ ] clean up unused variables, yikes
+- [ ] update TODO for next version
 - [ ] cargo update
 
 ----
@@ -45,7 +49,7 @@
 ### layer 
 - [x] clone_into_rows/set_from
 - [x] pad x, y, row
-- [ ] rotate_90/180/270
+- [ ] tumble_90/180/270
 
 ### stack 
 - [x] set_layer 
