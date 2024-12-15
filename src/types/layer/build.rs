@@ -71,7 +71,11 @@ impl<B: Block> Layer<B> {
         };
 
         self.layout_mut()[r] += blocks.len();
-        self.blocks_mut().append(&mut blocks);
+        
+        let mut tail = self.blocks_mut().split_off(index);
+        let head = self.blocks_mut();
+        head.append(&mut blocks);
+        head.append(&mut tail);
 
         Ok(self)
     }

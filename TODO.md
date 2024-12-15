@@ -8,7 +8,7 @@
 - [x] clean up Cargo.toml
 - [ ] clean up unused variables, yikes
 - [ ] update TODO for next version
-- [ ] cargo update
+- [ ] publish update to crates.io
 
 ----
 
@@ -19,7 +19,7 @@
 - [ ] Standardize and DRY, more utility functions
 - [ ] Optimization (not too dry that I'm repeating checks)
 - [x] Builder chain returning &self, &mut self, etc.
-- [ ] 1-based indexing to make lengths vs. indexes easier?
+- [ ] 1-based indexing to make lengths vs. indexes easier? 
 
 ----
 

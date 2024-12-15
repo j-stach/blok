@@ -14,13 +14,14 @@ pub trait Block: Clone + Default {
 
     /// Optional: Define the process for connecting blocks.
     /// Default behavior is to do nothing.
-    // TBD May make connections a trait extension.
+    #[allow(unused_variables)]
     fn connect(
         &mut self, 
         other: &mut Self, 
         instructions: &Self::ConnectionInstructions
     ) {
         // Do nothing
+        // TBD May make connections a trait extension.
     }
 
     /// Create a block that represents empty space.

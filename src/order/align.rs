@@ -144,8 +144,8 @@ impl Alignment {
     /// Returns an empty alignment.
     /// For when you do not want to make connections.
     pub fn none<T>(
-        row1: &Vec<T>, 
-        row2: &Vec<T>
+        _row1: &Vec<T>, 
+        _row2: &Vec<T>
     ) -> Self {
         Self::default()
     }
