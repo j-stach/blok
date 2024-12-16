@@ -1,7 +1,5 @@
 
-use super::*;
-
-use crate::{ Block, Row };
+use crate::{ Block, Layer };
 
 /// Functions for constructing layers:
 impl<B: Block> Layer<B> {
@@ -125,81 +123,5 @@ impl<B: Block> Layer<B> {
 
         Ok(self)
     }
-
-    /// Allocate a new row in the layer.
-    pub fn new_row(&mut self) -> &mut Self { 
-        self.layout_mut().push(0);
-        self
-    }
-
-    /// Add a row to the end of the layer.
-    pub fn add_row(&mut self, row: Row<B>) -> &mut Self {
-        self.add_blocks(row.to_vec());
-        self
-    }
-
-    /// Merge a row into the layer at the given index.
-    pub fn insert_row(
-        &mut self,
-        r: usize,
-        row: Row<B>
-    ) -> anyhow::Result<&mut Self> {
-        self.insert_blocks(r, 0, row.to_vec())
-    }
-
-    /// Create blocks using the given constructor,
-    /// adding them in rows according to the given layout.
-    pub fn populate(
-        &mut self, 
-        mut layout: Layout, 
-        instructions: &B::CreationInstructions
-    ) -> &mut Self {
-
-        for row in layout.iter() {
-            for _ in 0..*row {
-                let block = B::create(instructions);
-                self.blocks_mut().push(block)
-            }
-        }
-
-        self.layout_mut().append(&mut layout);
-        self
-    }
-
-    /// Create blocks by cloning a prototype,
-    /// adding them in rows according to the given layout.
-    pub fn populate_with_clones(
-        &mut self, 
-        mut layout: Layout, 
-        block: &B
-    ) -> &mut Self {
-
-        for row in layout.iter() {
-            for _ in 0..*row {
-                self.blocks_mut().push(block.clone());
-            }
-        }
-
-        self.layout_mut().append(&mut layout);
-        self
-    }
-
-    // TODO! Needs `disconnect` method for Block trait
-
-    ///// Remove the block at the given row, index.
-    //pub fn remove_block(
-    //    &mut self,
-    //    r: usize,
-    //    i: usize
-    //) -> anyhow::Result<()> {
-    //    // TODO
-    //    todo!{}
-    //}
-
-    ///// Remove the row from the given row.
-    //pub fn remove_row(&mut self, r: usize) -> anyhow::Result<()> {
-    //    // TODO
-    //    todo!{}
-    //}
 
 }

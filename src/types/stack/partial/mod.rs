@@ -120,6 +120,5 @@ impl<B: Block> Stack<B> {
         Some(stack_ref)
     }
 
-
 }
 

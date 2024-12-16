@@ -1,6 +1,5 @@
 
-use super::*;
-use crate::{ Block, Layout };
+use crate::{ Block, Stack, Layout };
 
 /// Methods for rapidly populating stacks with similar blocks:
 impl<B: Block> Stack<B> {

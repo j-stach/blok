@@ -6,7 +6,9 @@
 - [x] example 1
 - [ ] debug tests and example: Indexing errors
 - [x] clean up Cargo.toml
-- [ ] clean up unused variables, yikes
+- [x] clean up unused variables, yikes
+- [x] refactor modules 
+- [ ] finish missing methods
 - [ ] update TODO for next version
 - [ ] publish update to crates.io
 
@@ -34,8 +36,7 @@
 ----
 
 ## block
-- [ ] `disconnect` method for Block trait to allow remove
-- [ ] `remove`
+- [ ] `disconnect` method for Block trait to allow `remove`
 - [ ] Hide "connect", "clone", and other behavior behind feats
 - [ ] CreationInstruction factories
 

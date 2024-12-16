@@ -1,5 +1,5 @@
 
-use super::*;
+use crate::{ Block, Layer };
 
 /// Functions for modeling gaps and empty space:
 impl<B: Block> Layer<B> {

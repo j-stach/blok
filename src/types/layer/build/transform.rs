@@ -1,5 +1,5 @@
 
-use super::*;
+use crate::{ Block, Layer };
 
 /// Layer transformation functions:
 impl<B: Block> Layer<B> {

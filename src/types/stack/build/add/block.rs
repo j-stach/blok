@@ -1,6 +1,5 @@
 
-use super::*;
-use crate::Block;
+use crate::{ Block, Stack };
 
 //
 // TODO: Clean up and helper functions 
