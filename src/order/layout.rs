@@ -8,6 +8,7 @@ use serde::{ Serialize, Deserialize };
 pub struct Layout(pub(crate) Vec<usize>);
 
 impl Layout {
+
     /// Create a default (empty) layout.
     pub fn new() -> Self { 
         Self(Vec::new()) 
@@ -25,26 +26,69 @@ impl Layout {
         total
     }
 
+    /// Check if the layout contains enough rows to index.
+    /// Returns an error if the row index isn't found within the layout.
+    pub fn row_exists(&self, r: usize) -> anyhow::Result<()> {
+        if self.len() > r { Ok(()) } 
+        else {
+            Err(anyhow::anyhow!("Row index exceeds number of rows in layout"))
+        }
+    }
+
+    /// Check of the chosen row is empty.
+    /// Returns an error if the row index isn't found within the layout.
+    pub fn row_is_empty(&self, r: usize) -> anyhow::Result<bool> {
+        self.row_exists(r)?;
+        let row_len = self.get(r).expect("Row exists");
+        Ok(*row_len == 0) 
+    }
+
     /// Find the block index for the start of a row.
-    pub fn row_start(&self, row: usize) -> Option<usize> {
-        if self.get(row)? == &0 { return None };
+    /// Returns an error if the row index isn't found within the layout.
+    /// Returns None if the row is empty (contains no blocks).
+    pub fn row_start(&self, r: usize) -> anyhow::Result<Option<usize>> {
+        
+        // If the row is empty, there will be no start (None).
+        if self.row_is_empty(r)? { return Ok(None) }
 
         let mut start = 0usize;
-        for l in &self[0..row] {
+        for l in &self[0..r] {
             start += l
         }
-        Some(start)
+
+        Ok(Some(start))
     }
 
     /// Find the block index for the end of a row.
-    pub fn row_end(&self, row: usize) -> Option<usize> {
+    /// Returns an error if the row index isn't found within the layout.
+    /// Returns None if the row is empty (contains no blocks).
+    pub fn row_end(&self, r: usize) -> anyhow::Result<Option<usize>> {
         
-        let row_len = self.get(row)?;
-        if row_len == &0 { return None };
-
-        let start = self.row_start(row)?;
-        Some(start + row_len - 1)
+        // If the row is empty, there will be no start (None).
+        if let Some(start) = self.row_start(r)? {
+            let row_len = self.get(r).expect("Row exists");
+            Ok(Some(start + row_len - 1))
+        } else { 
+            Ok(None)
+        }
     }
+
+    /// Get a range representing the layout row from start to end.
+    /// Returns an error if the row index isn't found within the layout.
+    /// Returns None if the row is empty (contains no blocks).
+    pub fn row_range(&self, r: usize) -> anyhow::Result<Option<(usize, usize)>> {
+
+        // If the row is empty, there will be no start (None).
+        if let Some(start) = self.row_start(r)? {
+            let end = self.row_end(r)
+                .expect("Row exists")
+                .expect("Row is not empty");
+            Ok(Some((start, end)))
+        } else {
+            Ok(None)
+        } 
+    }
+
 }
 
 impl FromIterator<usize> for Layout {
@@ -53,12 +97,15 @@ impl FromIterator<usize> for Layout {
     }
 }
 
-/// Macro for easy layout creation. Works like vec![].
+/// Macro for easy layout creation. Works like `vec![]`.
+/// If the compiler gives you trouble, try changing your brackets to parentheses:
+/// ```
+///let layouts = vec![layout!(), layout!(1), layout!(2, 2), layout!(3; 3)];
+/// ```
 #[macro_export] macro_rules! layout {
     () => { Layout::new() };
     ($($elem:expr),+ $(,)?) => {{ Layout::wrap(vec![$($elem),+]) }};
     ($elem:expr; $count:expr) => {{ Layout::wrap(vec![$elem; $count]) }};
 }
-
 
 
