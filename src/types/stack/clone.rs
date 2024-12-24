@@ -2,145 +2,200 @@
 use super::*;
 use crate::{ Layout, Row };
 
-//
-// TODO
-// These are sloppy and inefficient. 
-// Don't clone multiple times, rewrite the algorithms for efficiency.
-//
-
-
 /// Methods for cloning blocks and setting stacks directly from blocks.
 /// Useful when building or connecting asynchronously with blocks that are Sync + Send.
 /// Partial clones are also found here.
 impl<B: Block> Stack<B> {
 
     /// Clone the stack into an array of layers.
+    /// Returns an empty Vec when the stack has no blocks.
     pub fn clone_into_layers(&self) -> Vec<Layer<B>> {
-        let mut layers = Vec::new();
-        let mut blocks = self.blocks().clone();
 
-        for layout in self.layouts().iter() {
-            let t = layout.total();
-            let rest = blocks.split_off(t);
-            let mut layer = Layer::default();
-            layer.set_from_layout(layout.clone(), blocks)
-                .expect("Layout corrupted"); // TODO Error
-            blocks = rest;
-            layers.push(layer)
+        let mut layers = Vec::new();
+        let num_layers = self.layouts.len();
+
+        // Clone each layer and push to the collection Vec.
+        for l in 0..num_layers {
+            // No need for checks when using the layouts for guidance.
+            let layer_clone = self.clone_layer(l).expect("Layer exists");
+            layers.push(layer_clone);
         }
 
         layers
     }
 
-    /// Overwrite the stack's values from an array of layers.
-    pub fn set_from_layers(&mut self, layers: Vec<Layer<B>>) {
+    /// Overwrite the stack's values with an array of layers.
+    pub fn set_from_layers(&mut self, layers: Vec<Layer<B>>) -> &mut Self {
+
+        // Set layouts directly from layer data, 
         self.layouts = layers.iter()
             .map(|layer| layer.layout().clone())
             .collect();
 
+        // then flatten blocks into one vec.
         self.blocks = layers.iter()
             .flat_map(|layer| layer.blocks().clone())
             .collect();
+
+        // Return the newly-configured stack.
+        self
     }
 
     /// Clone the stack into a matrix of rows.
+    /// Returns an empty Vec when the stack has no blocks.
     pub fn clone_into_rows(&self) -> Vec<Vec<Row<B>>> {
 
-        let blocks = self.clone_into_blocks();
+        let mut layers = Vec::new();
+        let layouts = self.layouts();
 
-        blocks.into_iter()
-            .map(|layer|
-                layer.into_iter()
-                    .map(|row| Row::wrap(row))
-                    .collect::<Vec<Row<B>>>()
-            )
-            .collect::<Vec<Vec<Row<B>>>>()
-    }
+        // Each layout represents the shape of a layer.
+        for (l, layout) in layouts.iter().enumerate() {
+            // Represent the layer as a Vec of rows.
+            let mut rows = Vec::new();
+            let num_rows = layout.len();
 
-    /// Overwrite the stack's values from a matrix of rows.
-    pub fn set_from_rows(&mut self, rows: Vec<Vec<Row<B>>>) {
+            // Clone each row in the layer. 
+            for r in 0..num_rows {
+                // No need for checks when using the layouts for guidance.
+                let cloned_row = self.clone_row(l, r)
+                    .expect("Row exists");
+                rows.push(cloned_row);
+            }
 
-        let mut layouts = Vec::new();
-
-        for layer in rows.iter() {
-            let layout: Vec<usize> = layer.iter().map(|r| r.len()).collect();
-            let layout = Layout::wrap(layout);
-            layouts.push(layout);
+            layers.push(rows);
         }
 
+        layers
+    }
+
+    /// Overwrite the stack's values with a matrix of rows.
+    pub fn set_from_rows(&mut self, rows: Vec<Vec<Row<B>>>) -> &mut Self {
+
+        // Set layouts based on matrix, 
+        let mut layouts = Vec::new();
+        rows.iter()
+            .for_each(|l| {
+                let mut layout = Layout::new();
+                l.iter().for_each(|r| layout.push(r.len()));
+                layouts.push(layout)
+            });
+        
+        // then flatten blocks into one vec.
         let blocks: Vec<B> = rows.into_iter()
-            .flat_map(|layer| 
-                layer.into_iter()
-                    .flat_map(|row| row.blocks)
+            .flat_map(|l| {
+                l.into_iter()
+                    .flat_map(|r| {
+                        r.blocks
+                    })
                     .collect::<Vec<B>>()
-            )
+            })
             .collect();
 
+        // Set directly and return the newly-configured stack.
         self.layouts = layouts;
         self.blocks = blocks;
-
+        self
     }
 
     /// Clone the stack into a matrix of blocks.
+    /// Returns an empty Vec when the stack has no blocks.
     pub fn clone_into_blocks(&self) -> Vec<Vec<Vec<B>>> {
-        let layers = self.clone_into_layers();
-        let mut blocks = Vec::new();
 
-        for layer in layers.into_iter() {
-            blocks.push(layer.clone_into_blocks())
-        }
-
-        blocks
+        // Mirrors the structure of the partial reference, so we can just map it.
+        self.get_all_ref()
+            .unwrap_or(Vec::new())
+            .into_iter()
+            .map(|l| {
+                l.into_iter()
+                    .map(|r| {
+                        r.into_iter()
+                            .map(|b| b.clone())
+                            .collect()
+                    })
+                    .collect()
+            })
+            .collect()
     }
 
-    /// Overwrite the stack's values from a matrix of blocks.
-    pub fn set_from_blocks(&mut self, blocks: Vec<Vec<Vec<B>>>) {
-        let mut layers = Vec::new();
+    /// Overwrite the stack's values with a matrix of blocks.
+    pub fn set_from_blocks(&mut self, blocks: Vec<Vec<Vec<B>>>) -> &mut Self {
 
-        for bb in blocks.iter() {
-            let mut layer = Layer::default();
-            layer.set_from_blocks(bb.to_owned());
-            layers.push(layer)
-        }
+        // Set layouts based on matrix, 
+        let mut layouts = Vec::new();
+        blocks.iter()
+            .for_each(|l| {
+                let mut layout = Layout::new();
+                l.iter().for_each(|r| layout.push(r.len()));
+                layouts.push(layout)
+            });
+        
+        // then flatten blocks into one vec.
+        let blocks: Vec<B> = blocks.into_iter()
+            .flat_map(|l| {
+                l.into_iter()
+                    .flatten()
+            })
+            .collect();
 
-        self.set_from_layers(layers);
+        // Set directly and return the newly-configured stack.
+        self.layouts = layouts;
+        self.blocks = blocks;
+        self
     }
 
     /// Clone a layer from the stack and return it as a new structure.
-    pub fn clone_layer(&self, l: usize) -> Option<Layer<B>> {
+    /// Returns None if the layer does not exist in the stack, or is empty.
+    pub fn clone_layer(
+        &self, 
+        l: usize
+    ) -> Option<Layer<B>> {
 
-        let layout = self.layouts.get(l)?;
-        let (start, end) = self.find_layer_bounds(l)?;
+        // Use partial reference to perform checks & validations,
+        let blocks: Vec<B> = self.get_layer_ref(l)?
+            .into_iter()
+            // then flatten reference vectors into a Vec of clones.
+            .flat_map(|r| {
+                r.into_iter()
+                    .map(|b| b.clone())
+                    .collect::<Vec<B>>()
+            })
+            .collect();
 
-        let mut layer = Layer::default();
-        // TODO Revisit this:
-        layer.set_from_layout(
-            layout.clone(), 
-            self.blocks()[start..end].to_vec() 
-        )
-        .unwrap();
+        // No need to repeat checks.
+        let layout = self.layouts.get(l)
+            .expect("Layout exists if layer ref exists")
+            .clone();
+
+        // Set a new layer using the cloned values.
+        let mut layer = Layer::new();
+        layer.set_from_layout(layout, blocks)
+            .expect("Layout is not corrupted");
 
         Some(layer)
     }
 
     /// Clone a row from the stack and return it as a new structure.
-    pub fn clone_row (
+    /// Returns None if the row does not exist in the stack, or is empty.
+    pub fn clone_row(
         &self, 
         l: usize,
         r: usize
     ) -> Option<Row<B>> {
 
+        // Use partial reference to perform checks & validations.
         let blocks: Vec<B> = self.get_row_ref(l, r)?
             .into_iter()
             .map(|b| b.clone())
             .collect();
 
+        // Set a new row using the cloned values.
         let row = Row::wrap(blocks);
         Some(row)
     }
 
     /// Clone a block from the stack and return it as a new structure.
-    pub fn clone_block (
+    /// Returns None if the block does not exist in the stack.
+    pub fn clone_block(
         &self, 
         l: usize,
         r: usize,
