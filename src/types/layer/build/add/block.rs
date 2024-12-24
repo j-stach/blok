@@ -89,7 +89,7 @@ impl<B: Block> Layer<B> {
         // BUG
         let index = self.find_block_index(r, i);
         // BUG
-        if index.is_none() { 
+        if index.is_ok() { 
             return Err(anyhow::anyhow!("Block index does not exist"))
         }
 
@@ -109,7 +109,7 @@ impl<B: Block> Layer<B> {
     ) -> anyhow::Result<&mut Self> {
 
         let index = self.find_block_index(r, i);
-        if index.is_none() { 
+        if index.is_ok() { 
             return Err(anyhow::anyhow!("Block index does not exist"))
         }
 

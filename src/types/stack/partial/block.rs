@@ -6,20 +6,27 @@ use crate::Block;
 impl<B: Block> Stack<B> {
 
     /// Find the block index given its position in the stack.
-    /// Returns None if the block does not exist.
+    /// Returns an error if the block does not exist at that index.
     pub fn find_block_index(
         &self,
         l: usize,
         r: usize,
-        i: usize
-    ) -> Option<usize> {
+        b: usize
+    ) -> anyhow::Result<usize> {
 
-        let (start, end) = self.find_row_bounds(l, r)?;
-        if end - start > i { 
-            None 
-        } else {
-            Some(start + i)
+        let row_bounds = self.find_row_bounds(l, r)?;
+        // If the row contains blocks,
+        if let Some((start, end)) = row_bounds {
+            // and if the index is within the row,
+            if end - start >= b { 
+                // Calculate the index for the block.
+                let index = start + b;
+                return Ok(index)
+            }
         }
+
+        // TODO Descriptive errors
+        Err(anyhow::anyhow!("Block index does not exist"))
     }
 
     /// Get a reference to the block at the given index.
@@ -28,16 +35,11 @@ impl<B: Block> Stack<B> {
         &self,
         l: usize,
         r: usize,
-        i: usize
+        b: usize
     ) -> Option<&B> {
 
-        let row_start = self.find_row_start(l, r)?;
-
-        if i >= self.layouts[l][r] {
-            return None
-        }
-
-        let block = &self.blocks[row_start + i];
+        let index = self.find_block_index(l, r, b).ok()?;
+        let block = &self.blocks[index];
         Some(block)
     }
 
@@ -47,16 +49,11 @@ impl<B: Block> Stack<B> {
         &mut self,
         l: usize,
         r: usize,
-        i: usize
+        b: usize
     ) -> Option<&mut B> {
 
-        let row_start = self.find_row_start(l, r)?;
-
-        if i >= self.layouts[l][r] {
-            return None
-        }
-
-        let block = &mut self.blocks[row_start + i];
+        let index = self.find_block_index(l, r, b).ok()?;
+        let block = &mut self.blocks[index];
         Some(block)
     }
 

@@ -5,18 +5,23 @@ use crate::{ Block, Layer };
 impl<B: Block> Layer<B> {
 
     /// Returns None if the block could not be found.
+    /// Returns an error if the row doesn't exist within the layer, 
+    /// or if the block does not exist within the row.
     pub fn find_block_index(
         &self,
         r: usize,
         i: usize
-    ) -> Option<usize> {
+    ) -> anyhow::Result<usize> {
 
-        let (start, end) = self.find_row_bounds(r)?;
-        if end - start < i {
-            return None
+        // If the row is empty, it will not have a start or end (None).
+        if let Some((start, end)) = self.find_row_bounds(r)? {
+            if end - start < i {
+                return Err(anyhow::anyhow!("Block index exceeds length of row"))
+            }
+            Ok(start + i)
+        } else {
+            Err(anyhow::anyhow!("Row contains no blocks"))
         }
-
-        Some(start + i)
     }
 
     /// Get a reference to a block at the given row and index.
@@ -27,9 +32,12 @@ impl<B: Block> Layer<B> {
         i: usize
     ) -> Option<&B> {
 
-        let index = self.find_block_index(r, i)?;
-        let block = &self.blocks[index];
-        Some(block)
+        if let Ok(index) = self.find_block_index(r, i) {
+            let block = self.blocks.get(index).expect("Block exists");
+            Some(block)
+        } else {
+            None
+        }
     }
 
     /// Get a mutable reference to a block at the given row and index.
@@ -40,9 +48,12 @@ impl<B: Block> Layer<B> {
         i: usize
     ) -> Option<&mut B> {
 
-        let index = self.find_block_index(r, i)?;
-        let block = &mut self.blocks[index];
-        Some(block)
+        if let Ok(index) = self.find_block_index(r, i) {
+            let block = self.blocks.get_mut(index).expect("Block exists");
+            Some(block)
+        } else {
+            None
+        }
     }
 
 }

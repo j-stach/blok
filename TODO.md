@@ -9,6 +9,7 @@
 - [x] clean up unused variables, yikes
 - [x] refactor modules 
 - [ ] finish missing methods
+- [ ] Helper functions and types for ranges etc.
 - [ ] update TODO for next version
 - [ ] publish update to crates.io
 
