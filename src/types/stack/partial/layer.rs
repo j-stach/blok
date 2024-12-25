@@ -1,5 +1,4 @@
 
-
 use super::*;
 use crate::Block;
 
@@ -82,7 +81,7 @@ impl<B: Block> Stack<B> {
     }
 
     /// Get a vector of vectors of references to the blocks that represent a layer.
-    /// Returns None if the layer could not be found.
+    /// Returns None if the layer could not be found, or is empty.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
     pub fn get_layer_ref(
@@ -90,22 +89,28 @@ impl<B: Block> Stack<B> {
         l: usize
     ) -> Option<Vec<Vec<&B>>> {
 
-        // Merge errors into Option for top-level ease of use.
-        let (start, end) = self.find_layer_bounds(l).ok()??;
+        // Convert errors into Option for top-level ease of use.
+        if let Some((start, end)) = self.find_layer_bounds(l).ok()? {
 
-        // Get the corresponding blocks and layout.
-        let blocks = self.get_range_ref(start, end)?;
-        let layout = self.layouts.get(l)
-            .expect("Layout exists");
-    
-        // Use the helper to organize blocks.
-        let rows = layer_ref_organization_helper::<&B>(layout, blocks);
+            // Get the corresponding blocks and layout.
+            let blocks = self.get_range_ref(start, end)
+                .expect("Layer contains blocks");
+            let layout = self.layouts.get(l)
+                .expect("Layout exists");
+        
+            // Use the layout to organize blocks to reflect the layer structure.
+            let rows = layer_ref_organization_helper::<&B>(layout, blocks);
 
-        Some(rows)
+            Some(rows)
+
+        } else { 
+            // Return an empty Vec if there are no blocks found.
+            Some(Vec::new())
+        }
     }
 
     /// Get a vector of vectors of mutable references to the blocks that represent a layer.
-    /// Returns None if the layer could not be found.
+    /// Returns None if the layer could not be found, or is empty.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
     pub fn get_layer_mut (
@@ -113,21 +118,27 @@ impl<B: Block> Stack<B> {
         l: usize
     ) -> Option<Vec<Vec<&mut B>>> {
 
-        // Merge errors into Option for top-level ease of use.
-        let (start, end) = self.find_layer_bounds(l).ok()??;
+        // Convert errors into Option for top-level ease of use.
+        if let Some((start, end)) = self.find_layer_bounds(l).ok()? {
 
-        // Clone layout here because of borrowing rules.
-        // It only includes positional data so the blocks themselves are safe.
-        let layout = self.layouts.get(l)
-            .expect("Layout exists")
-            .clone();
-        // Get the corresponding blocks and layout.
-        let blocks = self.get_range_mut(start, end)?;
-    
-        // Use the helper to organize blocks.
-        let rows = layer_ref_organization_helper::<&mut B>(&layout, blocks);
+            // Clone layout here because of borrowing rules.
+            // It only includes positional data so the blocks themselves are safe.
+            let layout = self.layouts.get(l)
+                .expect("Layout exists")
+                .clone();
+            // Get the corresponding blocks and layout.
+            let blocks = self.get_range_mut(start, end)
+                .expect("Layer contains blocks");
+        
+            // Use the layout to organize blocks to reflect the layer structure.
+            let rows = layer_ref_organization_helper::<&mut B>(&layout, blocks);
 
-        Some(rows)
+            Some(rows)
+
+        } else { 
+            // Return an empty Vec if there are no blocks found.
+            Some(Vec::new())
+        }
     }
 
 }

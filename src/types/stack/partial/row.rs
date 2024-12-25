@@ -1,5 +1,4 @@
 
-
 use super::*;
 use crate::Block;
 
@@ -97,7 +96,7 @@ impl<B: Block> Stack<B> {
     }
 
     /// Get a vector of references to the blocks that represent a layer row.
-    /// Returns None if the row could not be found.
+    /// Returns None if the row could not be found, or an empty Vec if the row is empty.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
     pub fn get_row_ref(
@@ -106,13 +105,17 @@ impl<B: Block> Stack<B> {
         r: usize
     ) -> Option<Vec<&B>> {
         
-        // Merge errors into Option for top-level ease of use.
-        let (start, end) = self.find_row_bounds(l, r).ok()??;
-        self.get_range_ref(start, end)
+        // Convert errors into Option for top-level ease of use.
+        if let Some((start, end)) = self.find_row_bounds(l, r).ok()? {
+            self.get_range_ref(start, end)
+        } else {
+            // Return an empty Vec if there are no blocks found.
+            Some(Vec::new())
+        }
     }
 
     /// Get a vector of mutable references to the blocks that represent a layer row.
-    /// Returns None if the row could not be found.
+    /// Returns None if the row could not be found, or an empty Vec if the row is empty.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
     pub fn get_row_mut(
@@ -121,9 +124,13 @@ impl<B: Block> Stack<B> {
         r: usize
     ) -> Option<Vec<&mut B>> { 
 
-        // Merge errors into Option for top-level ease of use.
-        let (start, end) = self.find_row_bounds(l, r).ok()??;
-        self.get_range_mut(start, end)
+        // Convert errors into Option for top-level ease of use.
+        if let Some((start, end)) = self.find_row_bounds(l, r).ok()? {
+            self.get_range_mut(start, end)
+        } else {
+            // Return an empty Vec if there are no blocks found.
+            Some(Vec::new())
+        }
     }
 
 }

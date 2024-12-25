@@ -31,11 +31,11 @@ impl<B: Block> Stack<B> {
     ) -> Option<Vec<&B>> {
 
         // Check for bounds.
-        let total = self.blocks.len();
-        if start > end || end >= total { 
-            return None 
+        if !range_boundary_check_helper(self.blocks.len(), start, end) {
+            return None
         }
 
+        // No need to repeat range checks.
         let blocks = self.blocks[start..=end].iter().collect();
         Some(blocks)
     }
@@ -51,82 +51,73 @@ impl<B: Block> Stack<B> {
     ) -> Option<Vec<&mut B>> {
 
         // Check for bounds.
-        let total = self.blocks.len();
-        if start > end || end >= total { 
-            return None 
+        if !range_boundary_check_helper(self.blocks.len(), start, end) {
+            return None
         }
 
+        // No need to repeat range checks.
         let blocks = self.blocks[start..=end].iter_mut().collect();
         Some(blocks)
     }
 
     /// Get a matrix of references to all blocks.
-    /// Returns None if the stack is empty.
+    /// Returns an empty Vec if the stack is empty.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
-    pub fn get_all_ref(&self) -> Option<Vec<Vec<Vec<&B>>>> {
-        if self.layouts.len() == 0 { return None }
-
-        let mut stack_ref = Vec::new();
-        let mut blocks_ref: Vec<_> = self.blocks.iter().collect();
-
-        for layout in self.layouts.iter() {
-
-            let mut layer_ref = Vec::new();
-
-            let tail = blocks_ref.split_off(layout.total()); // DEBUG?
-            let mut layer_blocks_ref = blocks_ref;
-            blocks_ref = tail;
-
-            for r in layout.iter() {
-                let tail = layer_blocks_ref.split_off(*r); // DEBUG?
-                layer_ref.push(layer_blocks_ref);
-                layer_blocks_ref = tail;
-            }
-
-            stack_ref.push(layer_ref)
-        
-        }
-
-        Some(stack_ref)
+    pub fn get_all_ref(&self) -> Vec<Vec<Vec<&B>>> {
+        let blocks_ref: Vec<_> = self.blocks.iter().collect();
+        // Use layouts to represent stack structure as nested vectors.
+        collection_organization_helper::<&B>(self.layouts(), blocks_ref)
     }
 
     /// Get a matrix of mutable references to all blocks.
-    /// Returns None if the stack is empty.
+    /// Returns an empty Vec if the stack is empty.
     /// Use this for operations on a collection of blocks, not for building stack structure.
     /// (Adding to this vector will not add blocks to the stack.)
-    pub fn get_all_mut(&mut self) -> Option<Vec<Vec<Vec<&mut B>>>> {
-        if self.layouts.len() == 0 { return None }
-
-        let mut stack_ref = Vec::new();
-        let mut blocks_ref: Vec<_> = self.blocks.iter_mut().collect();
-
-        for layout in self.layouts.iter() {
-
-            let mut layer_ref = Vec::new();
-
-            let tail = blocks_ref.split_off(layout.total()); // DEBUG?
-            let mut layer_blocks_ref = blocks_ref;
-            blocks_ref = tail;
-
-            for r in layout.iter() {
-                let tail = layer_blocks_ref.split_off(*r); // DEBUG?
-                layer_ref.push(layer_blocks_ref);
-                layer_blocks_ref = tail;
-            }
-
-            stack_ref.push(layer_ref)
-        
-        }
-
-        Some(stack_ref)
+    pub fn get_all_mut(&mut self) -> Vec<Vec<Vec<&mut B>>> {
+        let layouts = self.layouts().clone(); // Clone for borrowing reasons.
+        let blocks_ref: Vec<_> = self.blocks.iter_mut().collect();
+        // Use layouts to represent stack structure as nested vectors.
+        collection_organization_helper::<&mut B>(&layouts, blocks_ref)
     }
 
 }
 
-// TODO 
-// range_collection_helper
-// all_collection_helper
-// with iter and iter_mut insertable
 
+/// Check whether the range falls within the total number of blocks.
+fn range_boundary_check_helper(total: usize, start: usize, end: usize) -> bool {
+    if start > end || end >= total { false } 
+    else { true }
+}
+
+/// Helps to organize blocks using layouts, 
+/// so that reference reflects stack structure.
+/// Returns an empty Vec when the stack is empty.
+fn collection_organization_helper<T>(
+    layouts: &Vec<Layout>,
+    mut blocks_ref: Vec<T>,
+) -> Vec<Vec<Vec<T>>> {
+
+    let mut stack_ref = Vec::new();
+
+    for layout in layouts.iter() {
+
+        let mut layer_ref = Vec::new();
+
+        let tail = blocks_ref.split_off(layout.total()); // DEBUG?
+        let mut layer_blocks_ref = blocks_ref;
+        blocks_ref = tail;
+
+        for r in layout.iter() {
+            let tail = layer_blocks_ref.split_off(*r); // DEBUG?
+            layer_ref.push(layer_blocks_ref);
+            layer_blocks_ref = tail;
+        }
+
+        stack_ref.push(layer_ref)
+    
+    }
+
+    stack_ref
+}
 

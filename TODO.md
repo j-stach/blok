@@ -63,3 +63,5 @@
 
 ----
 
+TODO:
+- Change partial refs to return empty vec on None, and None on error.
