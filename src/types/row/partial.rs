@@ -61,8 +61,7 @@ impl<B: Block> Row<B> {
     /// Use this for operations on a collection of blocks, not for building row structure.
     /// (Adding to this vector will not add blocks to the row.)
     pub fn get_all_ref(&self) -> Vec<&B> {
-        let row_ref = self.iter().collect();
-        Some(row_ref)
+        self.iter().collect()
     }
 
     /// Get a vector of mutable references to all blocks.
@@ -70,8 +69,7 @@ impl<B: Block> Row<B> {
     /// Use this for operations on a collection of blocks, not for building row structure.
     /// (Adding to this vector will not add blocks to the row.)
     pub fn get_all_mut(&mut self) -> Vec<&mut B> {
-        let row_ref = self.iter_mut().collect();
-        Some(row_ref)
+        self.iter_mut().collect()
     }
 
 }

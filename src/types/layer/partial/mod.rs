@@ -52,7 +52,7 @@ impl<B: Block> Layer<B> {
     /// Use this for operations on a collection of blocks, not for building layer structure.
     /// (Adding to this vector will not add blocks to the layer.)
     pub fn get_all_ref(&mut self) -> Vec<Vec<&B>> {
-        let mut blocks_ref: Vec<_> = self.blocks.iter().collect();
+        let blocks_ref: Vec<_> = self.blocks.iter().collect();
         // Use layout to represent layer structure as nested vectors.
         collection_organization_helper::<&B>(self.layout(), blocks_ref)
     }
@@ -64,7 +64,7 @@ impl<B: Block> Layer<B> {
     /// (Adding to this vector will not add blocks to the layer.)
     pub fn get_all_mut(&mut self) -> Vec<Vec<&mut B>> {
         let layout = self.layout().clone(); // Clone for borrowing reasons.
-        let mut blocks_ref: Vec<_> = self.blocks.iter_mut().collect();
+        let blocks_ref: Vec<_> = self.blocks.iter_mut().collect();
         // Use layout to represent layer structure as nested vectors.
         collection_organization_helper::<&mut B>(&layout, blocks_ref)
     }
