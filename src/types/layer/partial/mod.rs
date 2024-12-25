@@ -87,7 +87,7 @@ fn collection_organization_helper<T>(
 
     let mut layer_ref = Vec::new();
 
-    for r in self.layout.iter() {
+    for r in layout.iter() {
         let tail = blocks_ref.split_off(*r); // DEBUG?
         layer_ref.push(blocks_ref);
         blocks_ref = tail;
