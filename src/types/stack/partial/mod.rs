@@ -30,6 +30,7 @@ impl<B: Block> Stack<B> {
         end: usize
     ) -> Option<Vec<&B>> {
 
+        // Check for bounds.
         let total = self.blocks.len();
         if start > end || end >= total { 
             return None 
@@ -49,6 +50,7 @@ impl<B: Block> Stack<B> {
         end: usize
     ) -> Option<Vec<&mut B>> {
 
+        // Check for bounds.
         let total = self.blocks.len();
         if start > end || end >= total { 
             return None 
@@ -121,4 +123,10 @@ impl<B: Block> Stack<B> {
     }
 
 }
+
+// TODO 
+// range_collection_helper
+// all_collection_helper
+// with iter and iter_mut insertable
+
 

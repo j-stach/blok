@@ -15,19 +15,27 @@ impl<B: Block> Stack<B> {
         r: usize
     ) -> anyhow::Result<Option<(usize, usize)>> {
 
-        // TODO: Use Layout::row_range instead
+        // Efficiently handles errors and emptiness checks.
+        if !row_check_helper(self, l, r)? { return Ok(None) }
 
-        // If there are no blocks in the row, return None.
-        let start = self.find_row_start(l, r)?;
-        if start.is_none() {
-            return Ok(None)
-        }
+        // No need to repeat layer checks.  
+        let layer_start = self.find_layer_start(l)
+            .expect("Layer exists")
+            .expect("Layer contains blocks");
+        let layout = self.layouts.get(l)
+            .expect("Layout exists");
 
-        // No need to repeat checks if a start block is found.
-        let start = start
-            .expect("Layer contains blocks");
-        let end = self.find_row_end(l, r)?
-            .expect("Layer contains blocks");
+        // Uses `row_range` instead of `find_row_start` and `find_row_end`
+        // because although more complicated, I think it is more efficient?
+        // The Rust compiler is good so it's probably unnecessary 
+        // and this code could be simplified.
+        let (mut start, mut end) = layout.row_range(r)
+            .expect("Row exists")
+            .expect("Row contains blocks");
+
+        // Range is relative to layer start.
+        start += layer_start;
+        end += layer_start;
 
         Ok(Some((start, end)))
     }
@@ -41,25 +49,22 @@ impl<B: Block> Stack<B> {
         r: usize
     ) -> anyhow::Result<Option<usize>> {
     
-        // No need to repeat layer checks.  
-        let layer_start = self.find_layer_start(l)?;
-        let layout = self.layouts.get(l).expect("Layout exists");
+        // Efficiently handles errors and emptiness checks.
+        if !row_check_helper(self, l, r)? { return Ok(None) }
 
-        // If the layer exists but has no start, it should be empty,
-        if layer_start.is_none() {
-            // but we still have to check if the row exists.
-            layout.row_exists(r)?;
-            return Ok(None)
-        }
+        // No need to repeat checks.  
+        let layer_start = self.find_layer_start(l)
+            .expect("Layer exists")
+            .expect("Layer contains blocks");
+        let layout = self.layouts.get(l)
+            .expect("Layout exists");
 
-        // This returns None if the row is empty.
-        let row_start = layout.row_start(r)?;
-        if row_start.is_none() {
-            return Ok(None)
-        }
+        let mut start = layout.row_start(r)
+            .expect("Row exists")
+            .expect("Row contains blocks");
 
         // Row start is relative to layer start.
-        let start = layer_start.expect("Layer contains blocks") + row_start.expect("Row contains blocks");
+        start += layer_start;
         Ok(Some(start))
     }
 
@@ -71,23 +76,23 @@ impl<B: Block> Stack<B> {
         l: usize, 
         r: usize
     ) -> anyhow::Result<Option<usize>> {
+    
+        // Efficiently handles errors and emptiness checks.
+        if !row_check_helper(self, l, r)? { return Ok(None) }
 
-        // No need to repeat layer checks.  
-        let layer_start = self.find_layer_start(l)?;
-        let layout = self.layouts.get(l).expect("Layout exists");
+        // No need to repeat checks.  
+        let layer_start = self.find_layer_start(l)
+            .expect("Layer exists")
+            .expect("Layer contains blocks");
+        let layout = self.layouts.get(l)
+            .expect("Layout exists");
 
-        // If the layer exists but has no start, it should be empty,
-        if layer_start.is_none() {
-            // but we still have to check if the row exists.
-            layout.row_exists(r)?;
-            return Ok(None)
-        }
-
-        let row_end = layout.row_end(r)?
+        let mut end = layout.row_end(r)
+            .expect("Row exists")
             .expect("Row contains blocks");
 
-        // Row end is relative to layer start.
-        let end = layer_start.expect("Layer contains blocks") + row_end;
+        // Row start is relative to layer start.
+        end += layer_start;
         Ok(Some(end))
     }
 
@@ -123,5 +128,21 @@ impl<B: Block> Stack<B> {
 
 }
 
-// TBD Helper for find start/end checks?
+/// Returns an error if the layer or row is not present.
+/// Returns false if the row is empty (None).
+fn row_check_helper<B: Block>(stack: &Stack<B>, l: usize, r: usize) -> anyhow::Result<bool> {
+
+    // Error if layer not found.
+    let layout = stack.layouts.get(l)
+        .ok_or(anyhow::anyhow!("Layer {} is not present in the stack", l))?;
+
+    // Error if row not found,
+    if layout.row_is_empty(r)? {
+        // but empty if empty.
+        return Ok(false)
+    }
+
+    // The row is there and has blocks.
+    Ok(true)
+}
 

@@ -95,7 +95,8 @@ impl<B: Block> Stack<B> {
 
         // Get the corresponding blocks and layout.
         let blocks = self.get_range_ref(start, end)?;
-        let layout = &self.layouts[l];
+        let layout = self.layouts.get(l)
+            .expect("Layout exists");
     
         // Use the helper to organize blocks.
         let rows = layer_ref_organization_helper::<&B>(layout, blocks);
@@ -117,7 +118,9 @@ impl<B: Block> Stack<B> {
 
         // Clone layout here because of borrowing rules.
         // It only includes positional data so the blocks themselves are safe.
-        let layout = self.layouts[l].clone();
+        let layout = self.layouts.get(l)
+            .expect("Layout exists")
+            .clone();
         // Get the corresponding blocks and layout.
         let blocks = self.get_range_mut(start, end)?;
     
