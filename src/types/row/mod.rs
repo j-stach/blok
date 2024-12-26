@@ -7,8 +7,8 @@ pub mod clone;
 use derive_more::{ Deref, DerefMut };
 use crate::Block;
 
-/// Used to distinguish from the vector of blocks 
-/// that represents the entire collection
+/// Represents a 1D row of blocks in a positional context,
+/// to distinguish it from vectors of blocks that represent an entire collection
 /// (i.e. all of the blocks in a layer or stack).
 #[derive(Debug, Default, Clone, Deref, DerefMut)]
 pub struct Row<B: Block> {

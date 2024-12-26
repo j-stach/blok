@@ -46,18 +46,11 @@ impl<B: Block> Row<B> {
         other: &'c mut Self,
         block_align: Aligner<&'c mut B>, 
         instructions: Vec<B::ConnectionInstructions>
-    ) -> anyhow::Result<()> {
+    ) {
 
-        let this = self.get_all_mut();
-        let other = other.get_all_mut();
-        if this.is_none() || other.is_none() {
-            return Err(anyhow::anyhow!("Could not reference rows"))
-        }
-
-        let (mut this, mut other) = (this.unwrap(), other.unwrap());
+        let mut this = self.get_all_mut();
+        let mut other = other.get_all_mut();
         row_connection(&mut this, &mut other, block_align, instructions);
-
-        Ok(())
     }
 
 }
@@ -106,15 +99,11 @@ impl<B: Block> Layer<B> {
         row_align: Aligner<Vec<&'c mut B>>,
         block_align: Aligner<&'c mut B>, 
         instructions: Vec<Vec<B::ConnectionInstructions>>
-    ) -> anyhow::Result<()> {
+    ) {
 
-        let this = self.get_all_mut();
-        let other = other.get_all_mut();
-        if this.is_none() || other.is_none() {
-            return Err(anyhow::anyhow!("Could not reference layers"))
-        }
+        let mut this = self.get_all_mut();
+        let mut other = other.get_all_mut();
 
-        let (mut this, mut other) = (this.unwrap(), other.unwrap());
         layer_connection(
             &mut this, 
             &mut other, 
@@ -122,8 +111,6 @@ impl<B: Block> Layer<B> {
             block_align, 
             instructions
         );
-
-        Ok(())
     }
 
 }
@@ -174,15 +161,11 @@ impl<B: Block> Stack<B> {
         row_align: Aligner<Vec<&'c mut B>>,
         block_align: Aligner<&'c mut B>, 
         instructions: Vec<Vec<Vec<B::ConnectionInstructions>>>
-    ) -> anyhow::Result<()> {
+    ) {
 
-        let this = self.get_all_mut();
-        let other = other.get_all_mut();
-        if this.is_none() || other.is_none() {
-            return Err(anyhow::anyhow!("Could not reference stacks"))
-        }
+        let mut this = self.get_all_mut();
+        let mut other = other.get_all_mut();
 
-        let (mut this, mut other) = (this.unwrap(), other.unwrap());
         stack_connection(
             &mut this, 
             &mut other, 
@@ -191,8 +174,6 @@ impl<B: Block> Stack<B> {
             block_align, 
             instructions
         );
-
-        Ok(())
     }
 
 }

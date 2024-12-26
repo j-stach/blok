@@ -26,6 +26,14 @@ impl Layout {
         total
     }
 
+    /// Adds an empty row to an empty layout to prepare the layout
+    /// for use with layer-building methods.
+    pub(crate) fn prep(&mut self) {
+        if self.is_empty() { 
+            self.push(0) 
+        }
+    }
+
     /// Check if the layout contains enough rows to index.
     /// Returns an error if the row index isn't found within the layout.
     pub fn row_exists(&self, r: usize) -> anyhow::Result<()> {

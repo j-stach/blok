@@ -1,8 +1,6 @@
 
 use crate::{ Block, Row };
 
-/// Represents a 1D row of blocks in a positional context,
-/// to distinguish it from other vectors of blocks.
 impl<B: Block> Row<B> {
 
     /// Add a block to the end of the row. 
@@ -18,6 +16,8 @@ impl<B: Block> Row<B> {
     }
 
     /// Insert a block into the row at the given index.
+    /// Blocks cannot be inserted where there is not an existing block;
+    /// in such a situation, use an "add" method instead.
     pub fn insert_block(
         &mut self, 
         i: usize, 
@@ -33,6 +33,8 @@ impl<B: Block> Row<B> {
     }
     
     /// Insert a collection of blocks into the row at the given index.
+    /// Blocks cannot be inserted where there is not an existing block;
+    /// in such a situation, use an "add" method instead.
     pub fn insert_blocks(
         &mut self, 
         i: usize, 

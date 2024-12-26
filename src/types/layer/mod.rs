@@ -11,9 +11,9 @@ use crate::{ Block, Layout };
 #[derive(Debug, Default, Clone)]
 pub struct Layer<B: Block> {
     /// Represents the organization of blocks in the array.
-    layout: Layout,
+    pub(crate) layout: Layout,
     /// Blok assumes you want to store the block array contiguously in memory.
-    blocks: Vec<B>
+    pub(crate) blocks: Vec<B>
 }
 
 /// Field access methods:

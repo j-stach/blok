@@ -19,6 +19,8 @@ impl<B: Block> Layer<B> {
     // TODO: add_rows
 
     /// Merge a row into the layer at the given index.
+    /// Blocks cannot be inserted where there is not an existing block;
+    /// in such a situation, use an "add" method instead.
     pub fn insert_row(
         &mut self,
         r: usize,

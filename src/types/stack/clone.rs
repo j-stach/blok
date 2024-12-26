@@ -103,7 +103,6 @@ impl<B: Block> Stack<B> {
 
         // Mirrors the structure of the partial reference, so we can just map it.
         self.get_all_ref()
-            .unwrap_or(Vec::new())
             .into_iter()
             .map(|l| {
                 l.into_iter()

@@ -79,6 +79,8 @@ impl<B: Block> Layer<B> {
     }
 
     /// Insert a block into the given row, at the given index.
+    /// Blocks cannot be inserted where there is not an existing block;
+    /// in such a situation, use an "add" method instead.
     pub fn insert_block(
         &mut self,
         r: usize,
@@ -86,21 +88,18 @@ impl<B: Block> Layer<B> {
         block: B
     ) -> anyhow::Result<&mut Self> { 
         
-        // BUG
-        let index = self.find_block_index(r, i);
-        // BUG
-        if index.is_ok() { 
-            return Err(anyhow::anyhow!("Block index does not exist"))
-        }
+        let index = self.find_block_index(r, i)?;
 
         self.layout[r] += 1;
         // Unwrap is safe because we check for it above.
-        self.blocks.insert(index.unwrap(), block);
+        self.blocks.insert(index, block);
 
         Ok(self)
     }
 
     /// Insert a collection of blocks at the given index, in the given row.
+    /// Blocks cannot be inserted where there is not an existing block;
+    /// in such a situation, use an "add" method instead.
     pub fn insert_blocks(
         &mut self, 
         r: usize, 
