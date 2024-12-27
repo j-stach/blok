@@ -1,30 +1,20 @@
 
 use blok::Block;
 
-#[derive(Debug, Default, Clone, Eq, PartialEq)]
+#[derive(
+    Default, Clone,         // Necessary for Block impl
+    Debug, Eq, PartialEq    // Nice to have for testing
+)]
 pub struct TestBlock1 {
     pub id: String,
-    pub connections: Vec<String>,
 }
 
 impl Block for TestBlock1 {
     type CreationInstructions = String;
-    type ConnectionInstructions = u32;
 
     fn create(id: &String) -> Self {
         TestBlock1 {
             id: id.to_owned(),
-            connections: Vec::new(),
-        }
-    }
-
-    fn connect(
-        &mut self, 
-        other: &mut Self, 
-        times: &u32
-    ) {
-        for _ in 0..*times {
-            self.connections.push(other.id.clone())
         }
     }
 
@@ -42,18 +32,6 @@ impl Block for TestBlock1 {
 #[test] fn new_block_test() {
     let block1 = TestBlock1::create(&"block1".to_string());
     assert_eq!(block1.id, "block1");
-    assert_eq!(block1.connections.len(), 0);
-}
-
-/// Test using block connections.
-#[test] fn connect_block_test() {
-    let mut a = TestBlock1::create(&"a".to_string());
-    let mut b = TestBlock1::create(&"b".to_string());
-
-    a.connect(&mut b, &1);
-    assert_eq!(&a.connections[0], &b.id);
-    a.connect(&mut b, &2);
-    assert_eq!(a.connections.len(), 3);
 }
 
 /// Test using void blocks.
