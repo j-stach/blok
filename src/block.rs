@@ -5,24 +5,9 @@ pub trait Block: Clone + Default {
 
     /// Define the argument struct for creating a block.
     type CreationInstructions: Clone + Default;
-    
-    /// Define the argument struct for connecting blocks.
-    type ConnectionInstructions: Clone + Default;
 
     /// Define the process for constructing a new block.
     fn create(instructions: &Self::CreationInstructions) -> Self;
-
-    /// Optional: Define the process for connecting blocks.
-    /// Default behavior is to do nothing.
-    #[allow(unused_variables)]
-    fn connect(
-        &mut self, 
-        other: &mut Self, 
-        instructions: &Self::ConnectionInstructions
-    ) {
-        // Do nothing
-        // TBD May make connections a trait extension.
-    }
 
     /// Create a block that represents empty space.
     fn void() -> Self;
