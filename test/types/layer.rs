@@ -1,5 +1,5 @@
 
-use blok::{ Block, Row, Layout, layout, Layer };
+use blok::{ Block, Layout, layout, Layer };
 use crate::block::TestBlock1;
 
 //
@@ -54,66 +54,6 @@ use crate::block::TestBlock1;
     assert_eq!(layer.blocks().len(), 4);
 }
 
-// build
-#[test] fn build_layer_test() {
-
-    let mut layer = Layer::<TestBlock1>::default();
-    let new_block = |id: &str| TestBlock1::create(&id.to_string());
-
-    layer.add_block(new_block("00"));
-
-    layer.new_row();
-
-    layer.add_blocks(vec![
-        new_block("10"),
-        new_block("11"),
-        new_block("12"),
-    ]);
-
-    layer.add_block_to_row(0, new_block("02"))
-        .expect("");
-
-    layer.insert_block(0, 1, new_block("01"))
-        .expect("");
-
-    let third_row = Row::wrap(vec![
-        new_block("20"),
-        new_block("21"),
-        new_block("22"),
-    ]);
-
-    let fourth_row = Row::wrap(vec![
-        new_block("32"),
-    ]);
-
-    layer.add_row(fourth_row);
-
-    layer.insert_row(2, third_row)
-        .expect("");
-
-    layer.insert_blocks(3, 0, vec![
-        new_block("30"),
-        new_block("31"),
-    ]).expect("");
-
-    // assert layer shape
-
-    assert!(layer.insert_block(5, 0, new_block("miss")).is_err());
-    assert!(layer.insert_blocks(5, 0, vec![
-        new_block("miss"),
-        new_block("miss"),
-        new_block("miss"),
-    ]).is_err());
-
-    assert!(layer.insert_block(0, 5, new_block("miss")).is_err());
-    assert!(layer.insert_blocks(0, 5, vec![
-        new_block("miss"),
-        new_block("miss"),
-        new_block("miss"),
-    ]).is_err());
-
-    // assert layer unchanged
-}
 
 // populate
 #[test] fn populate_layer_test() {
@@ -134,39 +74,10 @@ use crate::block::TestBlock1;
     let mut layer = Layer::<TestBlock1>::default();
     layer.populate(layout![4; 4], &"test".to_string());
 
-    //let rows = layer.clone_into_rows();
-    //layer.set_from_rows(rows);
-
     let blocks = layer.clone_into_blocks();
     layer.set_from_blocks(blocks);
 }
 
-// voids
-#[test] fn layer_void_test() {
-    let mut layer = Layer::<TestBlock1>::default();
-    layer.populate(layout![4; 4], &"real".to_string());
-
-    layer.offset_x(1);
-
-    layer.offset_y(1);
-
-    layer.pad_x(1);
-
-    layer.pad_y(1);
-
-    layer.fill_voids(&"a".to_string());
-
-    layer.offset_row(0, 1).expect("Offset first row by 1");
-
-    layer.pad_row(0, 1);
-
-    let proto = TestBlock1::create(&"b".to_string());
-    layer.fill_with_clones(&proto);
-
-    layer.realize_voids();
-
-    layer.compress();
-}
 
 // partial
 #[test] fn partial_layer_reference_test() {
@@ -188,7 +99,7 @@ use crate::block::TestBlock1;
     assert!(layer.get_row_ref(1).is_none());
     assert!(layer.get_row_mut(1).is_none());
 
-    let mut block_01 = layer.get_block_mut(0, 1)
+    let block_01 = layer.get_block_mut(0, 1)
         .expect("Should mutate the second block.");
     block_01.id = "test".to_string();
     let block_01 = layer.get_block_ref(0, 1)

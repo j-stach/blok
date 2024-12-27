@@ -8,7 +8,8 @@
 - [x] clean up unused variables, yikes
 - [x] refactor modules 
 - [x] Helper functions and types for ranges etc.
-- [ ] Tests and examples refactored, unit tests in comments
+- [x] NodeBlock subtrait for connections
+- [ ] Tests and examples refactored, doc tests in comments
 - [x] update TODO for next version
 - [ ] publish update to crates.io
 

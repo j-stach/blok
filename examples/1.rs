@@ -82,7 +82,7 @@ fn build_cube() -> Stack<MyBlock> {
     base_layer.add_row(base_row_3);
 
     // Row is just a working-wrapper for a vector of blocks.
-    let mut row_2 = Row::wrap(vec![
+    let row_2 = Row::wrap(vec![
         new_block("020"),
         new_block("021"),
         new_block("022"),
@@ -201,7 +201,7 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
     stack.populate(layouts, &"Stone".to_string());
 
     // Stacks can be cloned into workable Layers...
-    let mut layers = stack.clone_into_layers()
+    let layers = stack.clone_into_layers()
         .into_iter()
         // Add a "border" of void blocks surrounding the blocks of each layer,
         // to centralize existing "Stone" blocks into a pyramid shape.

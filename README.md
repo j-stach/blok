@@ -38,7 +38,7 @@ In such a scenario, you must use a method that "adds" it to the structure, inste
 Conventions like this exist for ease-of-development through the early stages
 and will likely be corrected for improved ease-of-use as the crate is refined.
 4. The build process is designed to be similar at each level of construction,
-so it you are expecting to use a method that would correspond to another 
+so if you are expecting to use a method that would correspond to another 
 that exists for a different scale, but finding that it does not exist,
 then it is probable that the method or function has not been implemented yet.
 These corresponding methods will be fleshed out as the crate is refined, 
