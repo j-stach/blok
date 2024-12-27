@@ -1,35 +1,39 @@
 
 use blok::*;
 
+
 #[derive(Clone, Default)]
 struct MyBlock {
+    // A block's ID is its data.
     id: String
 }
 
-impl Block for MyBlock {
-    type CreationInstructions = String;
-    // NOTE:
-    // Boilerplate for non-nodular block types: 
-    // Connections are not included in this example.
-    type ConnectionInstructions = ();
 
+impl Block for MyBlock {
+
+    // Data type that the constructor expects.
+    type CreationInstructions = String;
+
+    // Make a new block based on the instructions given.
     fn create(id: &String) -> Self {
         MyBlock {
             id: id.to_owned(),
         }
     }
 
+    // Represents a data-less block (empty space).
     fn void() -> Self {
         Self::default()
     }
 
+    // A block's ID is its data, so an empty ID is an empty block.
     fn is_void(&self) -> bool {
         self.id.is_empty()
     }
 }
 
-/*
 
+// Let's build a cube the roundabout way.
 fn build_cube() -> Stack<MyBlock> {
     // Often, you will build upon an empty stack.
     let mut stack = Stack::new();
@@ -108,7 +112,6 @@ fn build_cube() -> Stack<MyBlock> {
     // Blocks can be modified in place using a partial refrence.
     // Partial refs are organized into vectors that reflect the layer structure.
     layer_1.get_all_mut()
-        .expect("Returns Some() if any blocks are present.")
         .into_iter()
         .enumerate()
         .for_each(|(r, row_mut)| {
@@ -132,7 +135,6 @@ fn build_cube() -> Stack<MyBlock> {
 
     // Stacks can also be partially-(de)referenced.
     stack.get_all_mut()
-        .expect("Returns Some() if any blocks are present.")
         .into_iter()
         .enumerate()
         .for_each(|(l, layer_mut)| { if l > 1 {
@@ -152,13 +154,15 @@ fn build_cube() -> Stack<MyBlock> {
     stack
 }
 
+
 // It can be done faster.
 fn build_cube_quickly() -> Stack<MyBlock> {
     let mut stack = Stack::new();
     stack
+        // Add all blocks at once:
         .populate_with_clones(vec!{ layout![4; 4]; 4 }, &MyBlock::void())
+        // Iterate over references to modify blocks in place:
         .get_all_mut()
-            .expect("There will eventually be better iterator/mapping support.")
             .into_iter()
             .enumerate()
             .for_each(|(l, layer_mut)| { 
@@ -174,6 +178,7 @@ fn build_cube_quickly() -> Stack<MyBlock> {
             });
     stack
 }
+
 
 // More complex shapes can be represented in a voxel-like way.
 fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
@@ -223,18 +228,18 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
     stack // Fit for a king.
 }
 
+
 // TODO: fn build_sphere() -> Stack { todo!{"Algorithm to calculate sphere slices"}}
 
-*/
+
 
 fn main() {
-    /*
 
     let cube_stack = build_cube();
     let quick_cube = build_cube_quickly();
 
+    // The two cubes should be identical:
     cube_stack.get_all_ref()
-        .unwrap()
         .into_iter()
         .enumerate()
         .for_each(|(l, layer_ref)| {
@@ -251,11 +256,12 @@ fn main() {
                 });
         });
 
+
     let pyramid_scene = build_pyramid(7);
 
-    let mut stone_counts: Vec<usize> = 
+    // The layers should be squares of odd numbers:
+    let stone_counts: Vec<usize> = 
         pyramid_scene.get_all_ref()
-            .unwrap()
             .into_iter()
             .map(|layer| {
                 layer.iter()
@@ -269,10 +275,5 @@ fn main() {
             .collect();
 
     assert_eq!(stone_counts, vec![7^2, 5^2, 3^2, 1]);
-            
-
-    // TODO Assert and partial refs
     
-    */
-
 }
