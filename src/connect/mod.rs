@@ -1,10 +1,7 @@
 
 use crate::{ Node, Row, Layer, Stack, Aligner };
 
-// TODO Need a convenient way to map alignments into connection instructions 
-
-// TND Move these back?
-
+// TODO Split into modules?
 
 /// Connect two row refs of blocks according to the parameters given.
 /// If the number of instructions is fewer than connections to perform,
