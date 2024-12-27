@@ -1,9 +1,10 @@
 
-# blok (WIP)
-Traits for graphlike 3D arrays.
+# blok
+Traits for graphlike 3D arrays. (WIP)
 
 ## Usage
-See [example 1](/example/1.rs) for a basic demonstration of the library. <br>
+See [example 1](/example/1.rs) for a basic demonstration of building with blocks. <br>
+See [example 2](/example/2.rs) for a demonstration of procedural node connection. <br>
 See the [docs](https://docs.rs/blok/latest/blok/) 
 for explanations of specific types and methods.
 
@@ -26,12 +27,9 @@ Blok is a work-in-progress. Current tasks can be tracked in [TODO.md](/TODO.md).
 and will use the first letter of the type (b, l, r, ...) 
 when the argument expects a `usize` indicating the position 
 of the corresponding element within a stack.
-2. TODO: Explain use of Err and None when finding blocks. 
-If it tries to "find" a block index using layouts, it will fail with an error.
+2. Methods that "find" a block index using layouts will fail with an error.
 Methods that "get" references to blocks will treat that error as None,
 representing the failure to find the block as an absence.
-Advice is to use the high-level Option methods.
-Methods that reference empty rows return empty vectors.
 3. When building structures, blocks cannot be "inserted" at the last position of an element,
 or in any other situation where the future location cannot be indexed as an existing block.
 In such a scenario, you must use a method that "adds" it to the structure, instead.
