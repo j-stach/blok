@@ -24,7 +24,7 @@ Blok is a work-in-progress. Current tasks can be tracked in [TODO.md](/TODO.md).
 ## Notes on style
 1. Variable names in function declarations generally use the name of the type
 (block, row, layer, etc.) when that type is expected as an argument, 
-and will use the first letter of the type (b, l, r, ...) 
+and will use the first letter of the type (b, r, l) 
 when the argument expects a `usize` indicating the position 
 of the corresponding element within a stack.
 2. Methods that "find" a block index using layouts will fail with an error.
