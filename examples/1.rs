@@ -28,6 +28,7 @@ impl Block for MyBlock {
     }
 }
 
+/*
 
 fn build_cube() -> Stack<MyBlock> {
     // Often, you will build upon an empty stack.
@@ -224,8 +225,11 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
 
 // TODO: fn build_sphere() -> Stack { todo!{"Algorithm to calculate sphere slices"}}
 
+*/
 
 fn main() {
+    /*
+
     let cube_stack = build_cube();
     let quick_cube = build_cube_quickly();
 
@@ -268,5 +272,7 @@ fn main() {
             
 
     // TODO Assert and partial refs
+    
+    */
 
 }

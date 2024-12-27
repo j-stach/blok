@@ -4,23 +4,24 @@
 - [x] Connection methods 
 - [x] README
 - [x] example 1
-- [ ] debug tests and example: Indexing errors
 - [x] clean up Cargo.toml
 - [x] clean up unused variables, yikes
 - [x] refactor modules 
-- [ ] finish missing methods
-- [ ] Helper functions and types for ranges etc.
-- [ ] update TODO for next version
+- [x] Helper functions and types for ranges etc.
+- [ ] Tests and examples refactored, unit tests in comments
+- [x] update TODO for next version
 - [ ] publish update to crates.io
 
+# 0.0.3 TODO:
 ----
 
 ## General code
 - [x] Cleaning & refactor old code
 - [ ] Errors handled (thiserror)
 - [x] Optimization (in-place modification instead of cloning)
-- [ ] Standardize and DRY, more utility functions
+- [x] Standardize and DRY, more utility functions
 - [ ] Optimization (not too dry that I'm repeating checks)
+- [ ] finish missing methods
 - [x] Builder chain returning &self, &mut self, etc.
 - [ ] 1-based indexing to make lengths vs. indexes easier? 
 
