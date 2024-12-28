@@ -107,14 +107,10 @@ impl<B: Block> Layer<B> {
         mut blocks: Vec<B>
     ) -> anyhow::Result<&mut Self> {
 
-        let index = self.find_block_index(r, i);
-        if index.is_ok() { 
-            return Err(anyhow::anyhow!("Block index does not exist"))
-        }
+        let index = self.find_block_index(r, i)?;
 
         let total = blocks.len();
-        // Unwrap is safe because we check for it above.
-        let mut tail = self.blocks.split_off(index.unwrap());
+        let mut tail = self.blocks.split_off(index);
 
         self.blocks.append(&mut blocks);
         self.blocks.append(&mut tail);

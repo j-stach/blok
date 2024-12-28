@@ -1,10 +1,11 @@
 
+use super::*;
 use crate::{ Block, Row, Layer };
 
 /// Functions for constructing layers:
 impl<B: Block> Layer<B> {
 
-    /// Allocate a new row in the layer.
+    /// Allocate a new empty row in the layer.
     pub fn new_row(&mut self) -> &mut Self { 
         self.layout_mut().push(0);
         self
@@ -12,7 +13,8 @@ impl<B: Block> Layer<B> {
 
     /// Add a row to the end of the layer.
     pub fn add_row(&mut self, row: Row<B>) -> &mut Self {
-        self.add_blocks(row.to_vec());
+        self.new_row()
+            .add_blocks(row.to_vec());
         self
     }
 
@@ -24,9 +26,26 @@ impl<B: Block> Layer<B> {
     pub fn insert_row(
         &mut self,
         r: usize,
-        row: Row<B>
+        mut row: Row<B>
     ) -> anyhow::Result<&mut Self> {
-        self.insert_blocks(r, 0, row.to_vec())
+
+        // Check to make sure the row index exists before attempting to find previous row.
+        // TBD: Insert at end is a work in progress.
+        self.layout.row_exists(r)?;
+
+        // Use the helper function to find an index that can be used for reference.
+        // Gets the last block of the previous row, add 1 to find the "start" of the new row.
+        let index = previous_available_row_recursion_helper(self, r) + 1;
+
+        // Record the new row in the layout.
+        self.layout.insert(r, row.len());
+
+        // Insert blocks.
+        let mut tail = self.blocks.split_off(index);
+        self.blocks.append(&mut row.blocks);
+        self.blocks.append(&mut tail);
+
+        Ok(self)
     }
 
     // TODO: insert_rows

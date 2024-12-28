@@ -1,10 +1,6 @@
 
 use crate::{ Block, Layer };
 
-// TODO:
-// For "get" functions, None should return an empty vector, 
-// and errors (not-found) chould return None
-
 
 /// Methods for partial data access:
 impl<B: Block> Layer<B> {
