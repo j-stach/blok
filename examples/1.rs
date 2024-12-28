@@ -93,6 +93,8 @@ fn build_cube() -> Stack<MyBlock> {
     // Returns an error if the layer contains fewer rows then the value given. 
 
     // DEBUG: THIS FAILS HERE AND IN TESTS
+    // NEEDS THE RECURSION HELPERS
+
     base_layer.insert_row(2, row_2)
         .expect("Should insert row_2 before the previously-added row.");
 
@@ -255,7 +257,6 @@ fn main() {
                         });
                 });
         });
-
 
     let pyramid_scene = build_pyramid(7);
 
