@@ -1,7 +1,7 @@
 
 [package]
 name = "blok"
-description = "Traits and generics for graphlike 3D arrays"
+description = "Graphlike 3D arrays"
 authors = ["j-stach"]
 version = "0.0.2"
 edition = "2021"
