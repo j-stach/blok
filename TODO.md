@@ -9,12 +9,14 @@
 - [x] refactor modules 
 - [x] Helper functions and types for ranges etc.
 - [x] NodeBlock subtrait for connections
-- [ ] Tests and examples refactored, doc tests in comments
+- [x] Tests and examples refactored, doc tests in comments
+- [ ] Tests and examples debugged
+- [ ] previously_available_recursion_helper functions for Layer
 - [x] update TODO for next version
 - [ ] publish update to crates.io
 
-# 0.0.3 TODO:
 ----
+# 0.0.3 TODO:
 
 ## General code
 - [x] Cleaning & refactor old code

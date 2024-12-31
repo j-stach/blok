@@ -14,6 +14,7 @@ Blok is a work-in-progress. Current tasks can be tracked in [TODO.md](/TODO.md).
 - Stack, Layer, Row are all generic types
 - Added partial references
 - Connections no longer rely on clone 
+- Connect methods moved to Node trait
 - Alignments can be used on rows and layers during connection 
 #### For 0.0.3 
 - [ ] Error types

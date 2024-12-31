@@ -64,3 +64,14 @@ impl<B: Block> Layer<B> {
     
 }
 
+
+
+#[cfg(test)] mod test {
+
+    #[test] fn new_layer_test() {
+        //
+    }
+    
+}
+
+
