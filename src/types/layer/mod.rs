@@ -2,9 +2,9 @@
 pub mod build;
 pub mod partial;
 pub mod clone;
-//pub mod connect;
 
 use crate::{ Block, Layout };
+
 
 /// Holds a grid of blocks in a single vector, 
 /// with the layout tracked separately.
@@ -66,10 +66,52 @@ impl<B: Block> Layer<B> {
 
 
 
-#[cfg(test)] mod test {
+/*  UNIT TESTS  */
+#[cfg(test)] pub(crate) mod test {
 
+    use super::*;
+    use crate::{ layout, Layout };
+    use crate::block::test::TestBlock;
+    
+    /// Test for setting layer from given values.
+    pub(crate) fn test_layer() -> Layer<TestBlock> {
+        let mut layer = Layer::<TestBlock>::new();
+        let layout = layout![1, 2];
+        let mut blocks = vec![TestBlock::create(&"test".to_string()); 3];
+
+        // Name the blocks using their index in order to differentiate them.
+        for (b, block) in blocks.iter_mut().enumerate() {
+            block.id = b.to_string()
+        }
+
+        layer.set_from_layout(layout, blocks)
+            .expect("Set layer successful");
+
+        layer
+    }
+
+    /// Test for creating new layer.
     #[test] fn new_layer_test() {
-        //
+        let layer = Layer::<TestBlock>::new();
+        let layout = layer.layout();
+        let blocks = layer.blocks();
+        assert!(layout.is_empty() && blocks.is_empty(), "Default layer is empty");
+    }
+    
+    /// Test for setting layer from given values.
+    #[test] fn set_layer_test() {
+        test_layer();
+    }
+    
+    /// Test for setting layer from given values.
+    #[test] #[should_panic(expected = "Set layer fails")] fn bad_set_layer_test() {
+        let mut layer = Layer::<TestBlock>::new();
+        let layout = layout![1, 2];
+        // The number of blocks is fewer than the layout total:
+        let blocks = vec![TestBlock::create(&"test".to_string()); 2];
+
+        layer.set_from_layout(layout, blocks)
+            .expect("Set layer fails");
     }
     
 }

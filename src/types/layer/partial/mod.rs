@@ -2,7 +2,11 @@
 pub mod block;
 pub mod row;
 
+pub mod helpers;
+use helpers::*;
+
 use crate::{ Block, Layer, Layout };
+
 
 /// Methods for partial data access:
 impl<B: Block> Layer<B> {
@@ -71,28 +75,52 @@ impl<B: Block> Layer<B> {
 
 }
 
-/// Check whether the range falls within the total number of blocks.
-fn range_boundary_check_helper(total: usize, start: usize, end: usize) -> bool {
-    if start > end || end >= total { false } 
-    else { true }
-}
 
-/// Helps to organize blocks using the layout, 
-/// so that reference reflects layer structure.
-/// Returns an empty Vec when the layer is empty.
-fn collection_organization_helper<T>(
-    layout: &Layout,
-    mut blocks_ref: Vec<T>,
-) -> Vec<Vec<T>> {
 
-    let mut layer_ref = Vec::new();
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
 
-    for r in layout.iter() {
-        let tail = blocks_ref.split_off(*r); // DEBUG?
-        layer_ref.push(blocks_ref);
-        blocks_ref = tail;
+    use super::*;
+    use crate::{ Block, Layer, Layout };
+    use crate::types::layer::test::test_layer;
+
+    ///
+    #[test] fn get_range_test() {
+
+        // Test layer layout is [1, 2]
+        let mut layer = test_layer();
+
+        let range_ref = layer.get_range_ref(0, 2);
+        assert!(range_ref.is_some());
+
+        let range_mut = layer.get_range_mut(1, 1);
+        assert!(range_mut.is_some());
+
+        let bad_range_ref = layer.get_range_ref(0, 3);
+        assert!(bad_range_ref.is_none());
+
+        let bad_range_mut = layer.get_range_mut(3, 2);
+        assert!(bad_range_mut.is_none());
+
     }
-    
-    layer_ref
+
+    ///
+    #[test] fn get_all_test() {
+
+        // Test layer layout is [1, 2]
+        let mut layer = test_layer();
+
+        let ref_collection = layer.get_all_ref(); 
+        // Should mirror the structure of the test layer (1, 2):
+        assert_eq!(ref_collection.len(), 2);
+        assert_eq!(ref_collection[0].len(), 1);
+        assert_eq!(ref_collection[1].len(), 2);
+
+        let mut_collection = layer.get_all_mut(); 
+        // Should mirror the structure of the test layer (1, 2):
+        assert_eq!(mut_collection.len(), 2);
+        assert_eq!(mut_collection[0].len(), 1);
+        assert_eq!(mut_collection[1].len(), 2);
+    }
 }
 

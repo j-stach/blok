@@ -33,7 +33,9 @@ pub trait Node: Block {
             other: &mut Self, 
             times: &Self::ConnectionInstructions
         ) {
-            self.connections.push(other.id.clone()) 
+            for _ in 0..*times {
+                self.connections.push(other.id.clone()) 
+            }
         } 
     }
 

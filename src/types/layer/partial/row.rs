@@ -64,3 +64,52 @@ impl<B: Block> Layer<B> {
     }
 
 }
+
+
+
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
+
+    use super::*;
+    use crate::{ Block, Layer, Layout };
+    use crate::types::layer::test::test_layer;
+
+    ///
+    #[test] fn find_row_bounds_test() {
+
+        // Test layer layout is [1, 2]
+        let mut layer = test_layer();
+        layer.new_row();
+        // row bounds, start, end
+
+        assert_eq!(layer.find_row_start(0).unwrap(), Some(0));
+        assert_eq!(layer.find_row_end(0).unwrap(), Some(0));
+        assert_eq!(layer.find_row_bounds(0).unwrap(), Some((0,0)));
+
+        assert_eq!(layer.find_row_start(1).unwrap(), Some(1));
+        assert_eq!(layer.find_row_end(1).unwrap(), Some(2));
+        assert_eq!(layer.find_row_bounds(1).unwrap(), Some((1,2)));
+
+        assert_eq!(layer.find_row_start(2).unwrap(), None);
+        assert_eq!(layer.find_row_end(2).unwrap(), None);
+        assert_eq!(layer.find_row_bounds(2).unwrap(), None);
+
+        assert!(layer.find_row_start(3).is_err());
+        assert!(layer.find_row_end(3).is_err());
+        assert!(layer.find_row_bounds(3).is_err());
+    }
+
+    ///
+    #[test] fn get_row_test() {
+
+        // Test layer layout is [1, 2]
+        let mut layer = test_layer();
+
+        assert!(layer.get_row_ref(0).is_some());
+        assert!(layer.get_row_ref(1).is_some());
+        assert!(layer.get_row_ref(2).is_none());
+        assert_eq!(layer.get_row_mut(1).expect("Row exists").len(), 2);
+    }
+}
+
+
