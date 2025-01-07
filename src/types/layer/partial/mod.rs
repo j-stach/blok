@@ -5,8 +5,8 @@ pub mod row;
 pub mod helpers;
 use helpers::*;
 
-use crate::{ Block, Layer, Layout };
 
+use crate::{ Block, Layer };
 
 /// Methods for partial data access:
 impl<B: Block> Layer<B> {

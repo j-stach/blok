@@ -1,5 +1,5 @@
 
-use crate::{ Block, Layer, Layout };
+use crate::Layout;
 
 
 /// Check whether the range falls within the total number of blocks.

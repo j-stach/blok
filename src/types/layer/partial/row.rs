@@ -1,6 +1,7 @@
 
 use crate::{ Block, Layer };
 
+
 /// Methods for partial data access:
 impl<B: Block> Layer<B> {
 
