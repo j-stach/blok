@@ -142,3 +142,12 @@ impl<B: Block> Layer<B> {
     }
 
 }
+
+
+
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
+    //
+}
+
+

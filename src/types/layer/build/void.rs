@@ -97,7 +97,7 @@ impl<B: Block> Layer<B> {
         self
     }
 
-    /// Square off the matrix up to the given x and y,
+    /// Square off the matrix up to the given x (row) and y (length),
     /// by inserting void blocks into the empty indices.
     pub fn realize_area(
         &mut self, 
@@ -159,6 +159,72 @@ impl<B: Block> Layer<B> {
         self.set_from_blocks(rows);
 
         self
+    }
+
+}
+
+
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
+
+    // TODO: Need assert statements
+
+    use crate::{ Block, Layer };
+    use crate::types::layer::test::test_layer;
+
+    #[test] fn offset_test() {
+
+        let mut layer = test_layer();
+        layer.offset_x(1);
+        layer.offset_y(1);
+
+        // assert void in x and y
+    }
+
+    #[test] fn pad_test() {
+
+        let mut layer = test_layer();
+        layer.pad_x(1);
+        layer.pad_y(1);
+
+        // assert void in x and y
+    }
+
+    #[test] fn realize_voids_test() {
+
+        let mut layer = test_layer();
+        layer.realize_voids();
+
+        // 
+    }
+
+    #[test] fn realize_area_test() {
+
+        let mut layer = test_layer();
+        layer.realize_area(3, 3);
+
+        //
+    }
+
+    #[test] fn fill_voids_test() {
+
+        let mut layer = test_layer();
+        layer.realize_voids();
+        // layer.fill_voids
+
+        layer.realize_area(3, 3);
+        // layer.fill_with_clones
+
+        // assert no voids
+    }
+
+    #[test] fn compress_test() {
+
+        let mut layer = test_layer();
+        layer.realize_voids();
+        layer.compress();
+
+        // assert 3 total, no voids
     }
 
 }

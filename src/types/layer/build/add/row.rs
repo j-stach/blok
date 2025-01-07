@@ -51,3 +51,23 @@ impl<B: Block> Layer<B> {
     // TODO: insert_rows
 
 }
+
+
+
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
+
+    use crate::{ Block, Layer };
+    use crate::types::layer::test::test_layer;
+
+    /// Test adding row(s) to a layer.
+    #[test] fn add_row_test() {
+        //
+    }
+
+    /// Test inserting row(s) to a layer.
+    #[test] fn insert_row_test() {
+        //
+    }
+
+}

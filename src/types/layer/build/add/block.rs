@@ -1,7 +1,6 @@
 
 use crate::{ Block, Layer };
 
-/// Functions for constructing layers:
 impl<B: Block> Layer<B> {
 
     /// Add a new block to the last row in the layer.
@@ -117,6 +116,31 @@ impl<B: Block> Layer<B> {
         self.layout[r] += total;
 
         Ok(self)
+    }
+
+}
+
+
+
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
+
+    use crate::{ Block, Layer };
+    use crate::types::layer::test::test_layer;
+
+    /// Test adding block(s) to a layer.
+    #[test] fn add_block_test() {
+        //
+    }
+
+    /// Test inserting block(s) to a layer.
+    #[test] fn insert_block_test() {
+        //
+    }
+
+    /// Test adding block(s) to a row within a layer.
+    #[test] fn add_block_to_row_test() {
+        //
     }
 
 }

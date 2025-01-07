@@ -17,6 +17,7 @@ Blok is a work-in-progress. Current tasks can be tracked in [TODO.md](/TODO.md).
 - Connect methods moved to Node trait
 - Alignments can be used on rows and layers during connection 
 #### For 0.0.3 
+- [ ] Removing blocks
 - [ ] Error types
 - [ ] 1-based array indexing
 - [ ] Tests improved

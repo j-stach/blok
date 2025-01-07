@@ -42,3 +42,38 @@ impl<B: Block> Layer<B> {
     }
 
 }
+
+
+
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
+
+    use crate::{ Block, Layer, Layout, layout };
+    use crate::block::test::TestBlock;
+    
+    ///
+    #[test] fn populate_test() {
+
+        let layout = layout![2, 2];
+
+        let mut layer = Layer::<TestBlock>::new();
+        layer.populate(layout.clone(), &"test".to_string());
+
+        assert_eq!(layer.layout.total(), 4);
+        assert_eq!(layer.layout[0], 2);
+        assert_eq!(layer.layout[1], 2);
+
+        let mut layer = Layer::<TestBlock>::new();
+        layer.populate_with_clones(
+            layout.clone(), 
+            &TestBlock::create(&"test".to_string())
+        );
+
+        assert_eq!(layer.layout.total(), 4);
+        assert_eq!(layer.layout[0], 2);
+        assert_eq!(layer.layout[1], 2);
+
+    }
+}
+
+
