@@ -71,7 +71,7 @@ impl<B: Block> Layer<B> {
 
     use super::*;
     use crate::{ layout, Layout };
-    use crate::block::test::TestBlock;
+    use crate::block::{ Block, test::TestBlock };
     
     /// Test for setting layer from given values.
     pub(crate) fn test_layer() -> Layer<TestBlock> {
