@@ -1,4 +1,5 @@
 
+use super::*;
 use crate::{ Block, Layer };
 
 impl<B: Block> Layer<B> {
@@ -9,6 +10,7 @@ impl<B: Block> Layer<B> {
         if self.layout().len() == 0 { 
             self.new_row(); 
         }
+
         // We can unwrap here because we check length above.
         *self.layout_mut().last_mut().unwrap() += 1;
         self.blocks_mut().push(block);
@@ -16,10 +18,17 @@ impl<B: Block> Layer<B> {
         self
     }
 
-    /// Add a collection of blocks as a new row.
+    /// Add a collection of blocks to the last row in the layer.
     pub fn add_blocks(&mut self, mut blocks: Vec<B>) -> &mut Self {
-        self.layout_mut().push(blocks.len());
+
+        if self.layout().len() == 0 { 
+            self.new_row(); 
+        }
+
+        // We can unwrap here because we check length above.
+        *self.layout_mut().last_mut().unwrap() += blocks.len();
         self.blocks_mut().append(&mut blocks);
+
         self
     }
 
@@ -30,19 +39,10 @@ impl<B: Block> Layer<B> {
         block: B
     ) -> anyhow::Result<&mut Self> {
 
-        if self.layout().len() < r {
-            return Err(anyhow::anyhow!("Row {} DNE", r)) 
-        }
+        let row_end = self.find_row_end(r)?
+            .unwrap_or(previous_available_row_recursion_helper(self, r));
 
-        let index = {
-            let mut index = 0usize;
-            for rr in 0..r {
-                index += rr
-            }
-            index
-        };
-
-        self.blocks_mut().insert(index, block);
+        self.blocks_mut().insert(row_end + 1, block);
         self.layout_mut()[r] += 1;
 
         Ok(self)
@@ -55,21 +55,12 @@ impl<B: Block> Layer<B> {
         mut blocks: Vec<B>
     ) -> anyhow::Result<&mut Self> {
 
-        if self.layout().len() < r {
-            return Err(anyhow::anyhow!("Row {} DNE", r)) 
-        }
-
-        let index = {
-            let mut index = 0usize;
-            for rr in 0..r {
-                index += rr
-            }
-            index
-        };
+        let row_end = self.find_row_end(r)?
+            .unwrap_or(previous_available_row_recursion_helper(self, r));
 
         self.layout_mut()[r] += blocks.len();
         
-        let mut tail = self.blocks_mut().split_off(index);
+        let mut tail = self.blocks_mut().split_off(row_end + 1);
         let head = self.blocks_mut();
         head.append(&mut blocks);
         head.append(&mut tail);
@@ -90,7 +81,6 @@ impl<B: Block> Layer<B> {
         let index = self.find_block_index(r, i)?;
 
         self.layout[r] += 1;
-        // Unwrap is safe because we check for it above.
         self.blocks.insert(index, block);
 
         Ok(self)
@@ -126,21 +116,103 @@ impl<B: Block> Layer<B> {
 #[cfg(test)] mod test {
 
     use crate::{ Block, Layer };
+    use crate::block::test::TestBlock;
     use crate::types::layer::test::test_layer;
 
     /// Test adding block(s) to a layer.
     #[test] fn add_block_test() {
-        //
+
+        let mut layer = test_layer();
+        let new_block = |id: &str| TestBlock::create(&id.to_string());
+
+        layer.add_block(new_block("new block"));
+        assert_eq!(layer.layout[0], 1);
+        assert_eq!(layer.layout[1], 3);
+        assert_eq!(layer.get_block_ref(1, 2).unwrap().id, "new block");
+
+        layer.new_row();
+        layer.add_blocks(vec![]);
+        assert_eq!(layer.layout[2], 0);
+
+        layer.add_blocks(vec![
+            new_block("new 0"),
+            new_block("new 1"),
+            new_block("new 2")
+        ]);
+        assert_eq!(layer.layout[1], 3);
+        assert_eq!(layer.layout[2], 3);
+        assert_eq!(layer.get_block_ref(2, 0).unwrap().id, "new 0");
+        assert_eq!(layer.get_block_ref(2, 1).unwrap().id, "new 1");
+        assert_eq!(layer.get_block_ref(2, 2).unwrap().id, "new 2");
+
     }
 
     /// Test inserting block(s) to a layer.
     #[test] fn insert_block_test() {
-        //
+
+        let mut layer = test_layer();
+        let new_block = |id: &str| TestBlock::create(&id.to_string());
+
+        assert!(layer.insert_block(1, 2, new_block("bad index")).is_err());
+        assert!(layer.insert_block(1, 1, new_block("new block")).is_ok());
+        assert_eq!(layer.layout[0], 1);
+        assert_eq!(layer.layout[1], 3);
+        assert_eq!(layer.get_block_ref(1, 1).unwrap().id, "new block");
+
+        assert!(layer.insert_block(1, 0, new_block("newer block")).is_ok());
+        assert_eq!(layer.layout[1], 4);
+        assert_eq!(layer.get_block_ref(1, 2).unwrap().id, "new block");
+        assert_eq!(layer.get_block_ref(1, 0).unwrap().id, "newer block");
+
+        assert!(
+            layer.insert_blocks(0, 0, vec![
+                new_block("new 0"),
+                new_block("new 1"),
+                new_block("new 2")
+            ]).is_ok()
+        );
+        assert_eq!(layer.layout[0], 4);
+        assert_eq!(layer.get_block_ref(0, 0).unwrap().id, "new 0");
+        assert_eq!(layer.get_block_ref(0, 1).unwrap().id, "new 1");
+        assert_eq!(layer.get_block_ref(0, 2).unwrap().id, "new 2");
+
     }
 
     /// Test adding block(s) to a row within a layer.
     #[test] fn add_block_to_row_test() {
-        //
+
+        let mut layer = test_layer();
+        let new_block = |id: &str| TestBlock::create(&id.to_string());
+
+        assert!(
+            layer.add_block_to_row(0, new_block("new block")).is_ok()
+        );
+        assert_eq!(layer.layout[0], 2);
+        assert_eq!(layer.get_block_ref(0, 1).unwrap().id, "new block");
+
+        assert!(
+            layer.add_block_to_row(1, new_block("newer block")).is_ok()
+        );
+        assert_eq!(layer.layout[1], 3);
+        assert_eq!(layer.get_block_ref(1, 2).unwrap().id, "newer block");
+
+        assert!(
+            layer.add_block_to_row(2, new_block("bad index")).is_err()
+        );
+
+        layer.new_row();
+        assert!(
+            layer.add_blocks_to_row(2, vec![
+                new_block("new 0"),
+                new_block("new 1"),
+                new_block("new 2")
+            ]).is_ok()
+        );
+        assert_eq!(layer.layout[2], 3);
+        assert_eq!(layer.get_block_ref(2, 0).unwrap().id, "new 0");
+        assert_eq!(layer.get_block_ref(2, 1).unwrap().id, "new 1");
+        assert_eq!(layer.get_block_ref(2, 2).unwrap().id, "new 2");
+
     }
 
 }

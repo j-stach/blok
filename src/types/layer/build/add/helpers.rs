@@ -9,7 +9,7 @@ pub(super) fn previous_available_row_recursion_helper<B: Block>(
     r: usize
 ) -> usize {
     // Can't look before the first row, so just return the start of the collection.
-    if r == 0 { return 0 }
+    if r == 0 { return 0 } // DEBUG/NOTE: This is bad if the layer is empty...
 
     let search = layer.find_row_end(r - 1)
         .expect("Previous row exists");
@@ -25,8 +25,16 @@ pub(super) fn previous_available_row_recursion_helper<B: Block>(
 
 /*  UNIT TESTS  */
 #[cfg(test)] mod test {
+    use crate::block::{ Block, test::TestBlock };
+    use crate::types::layer::test::test_layer;
+
     /// 
     #[test] fn previous_available_row_recursion_test() {
-        //
+
+        let mut layer = test_layer();
+        layer.new_row();
+        layer.add_blocks(vec![TestBlock::create(&"test".to_string()); 3]);
+
+        // TBD: How best to test?
     }
 }
