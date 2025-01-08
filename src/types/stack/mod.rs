@@ -47,3 +47,22 @@ impl<B: Block> Stack<B> {
 
 }
 
+
+
+#[cfg(test)] mod test {
+    use crate::Stack;
+    use crate::block::{ Block, test::TestBlock };
+    use crate::types::layer::{ Layer, test::test_layer };
+    
+    pub(crate) fn test_stack() -> Stack<TestBlock> {
+        let mut stack = Stack::<TestBlock>::new();
+        stack.add_layers(vec![test_layer(); 3]);
+        stack
+    }
+
+    #[test] fn new_stack_test() {
+        test_stack();
+    }
+}
+
+

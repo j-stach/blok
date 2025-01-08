@@ -1,7 +1,7 @@
 
-
 use super::*;
 use crate::{ Block, Row, Stack };
+
 
 /// Methods for adding rows:
 impl<B: Block> Stack<B> {
@@ -154,5 +154,18 @@ impl<B: Block> Stack<B> {
         Ok(self)
     }
 
+}
+
+
+
+#[cfg(test)] mod test {
+    use crate::block::{ Block, test::TestBlock };
+    use crate::types::layer::{ Layer, test::test_layer };
+    use crate::types::stack::{ Stack, test::test_stack };
+
+    #[test] fn add_row_test() {}
+    #[test] fn add_row_to_layer_test() {}
+    #[test] fn insert_row_test() {}
+    
 }
 

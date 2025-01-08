@@ -162,3 +162,17 @@ impl<B: Block> Stack<B> {
     }
 }
 
+
+
+#[cfg(test)] mod test {
+    use crate::block::{ Block, test::TestBlock };
+    use crate::types::layer::{ Layer, test::test_layer };
+    use crate::types::stack::{ Stack, test::test_stack };
+    
+    #[test] fn add_block_test() {}
+    #[test] fn add_block_to_layer_test() {}
+    #[test] fn add_block_to_row_test() {}
+    #[test] fn insert_block_test() {}
+    
+}
+

@@ -206,3 +206,22 @@ impl<B: Block> Stack<B> {
     }
 
 }
+
+
+
+#[cfg(test)] mod test {
+    use crate::block::{ Block, test::TestBlock };
+    use crate::types::layer::{ Layer, test::test_layer };
+    use crate::types::stack::{ Stack, test::test_stack };
+    
+    /*
+    #[test] fn clone_stack_into_blocks_test() {}
+    
+    #[test] fn clone_stack_into_rows_test() {}
+    
+    #[test] fn clone_stack_into_layers_test() {}
+
+    #[test] fn partial_clone_test() {}
+    */
+}
+

@@ -39,7 +39,7 @@ impl<B: Block> Stack<B> {
 
         // Check to make sure the index exists before attempting to find previous layer.
         // TBD: Insert at end is a work in progress.
-        if self.layouts.len() >= l {
+        if self.layouts.len() <= l {
             return Err(anyhow::anyhow!("Stack could not be indexed at layer {l}"))
         }
 
@@ -71,7 +71,7 @@ impl<B: Block> Stack<B> {
 
         // Check to make sure the index exists before attempting to find previous layer.
         // TBD: Insert at end is a work in progress.
-        if self.layouts.len() >= l {
+        if self.layouts.len() <= l {
             return Err(anyhow::anyhow!("Stack could not be indexed at layer {l}"))
         }
 
@@ -99,6 +99,52 @@ impl<B: Block> Stack<B> {
         Ok(self)
     }
 
+    
+}
+
+
+
+#[cfg(test)] mod test {
+    use crate::block::{ Block, test::TestBlock };
+    use crate::types::layer::{ Layer, test::test_layer };
+    use crate::types::stack::{ Stack, test::test_stack };
+
+    ///
+    #[test] fn new_layer_test() {
+        let mut stack = test_stack();
+        stack.new_layer();
+        assert_eq!(stack.layouts[3].len(), 0);
+    }
+
+    ///
+    #[test] fn add_layer_test() {
+
+        let mut stack = test_stack();
+
+        stack.add_layer(test_layer());
+        assert_eq!(stack.layouts[3].len(), 2);
+        assert_eq!(stack.blocks.len(), 12);
+
+        stack.add_layers(vec![test_layer(); 2]);
+        assert_eq!(stack.layouts().len(), 6);
+        assert_eq!(stack.blocks.len(), 18);
+
+    }
+
+    ///
+    #[test] fn insert_layer_test() {
+
+        let mut stack = test_stack();
+        assert!(stack.insert_layer(3, test_layer()).is_err());
+        assert!(stack.insert_layer(2, test_layer()).is_ok());
+        assert!(stack.insert_layer(1, test_layer()).is_ok());
+        assert!(stack.insert_layer(0, test_layer()).is_ok());
+        assert_eq!(stack.layouts().len(), 6);
+
+        assert!(stack.insert_layers(0, vec![test_layer(); 3]).is_ok());
+        assert_eq!(stack.layouts().len(), 9);
+
+    }
     
 }
 
