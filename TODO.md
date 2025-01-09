@@ -1,11 +1,7 @@
 
-# blok 0.0.2 TODO:
-
-- [x] update TODO for next version
-- [ ] publish update to crates.io
+# blok 0.0.3 TODO:
 
 ----
-# 0.0.3 TODO:
 
 ## General code
 - [ ] Source files cleaned up 
