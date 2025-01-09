@@ -33,8 +33,9 @@ impl Block for MyBlock {
 }
 
 
-// Let's build a cube the roundabout way.
+// Let's build a cube the roundabout way:
 fn build_cube() -> Stack<MyBlock> {
+    
     // Often, you will build upon an empty stack.
     let mut stack = Stack::new();
 
@@ -126,7 +127,7 @@ fn build_cube() -> Stack<MyBlock> {
     // Stacks can also be populated, adding new layers atop any existing ones.
     stack.populate_with_clones(
         // These layouts describe layers in ascending order.
-        // Note: If the macro evaluation becomes confused, try using these brackets:
+        // Note: If the compiler gives you trouble, try using this combination of brackets:
         vec![ layout!(4; 4), layout!(4; 4) ],
         &MyBlock::void()
     );
@@ -148,18 +149,19 @@ fn build_cube() -> Stack<MyBlock> {
         }});
 
 
-    // That's a 4x4 cube, the roundabout way.
+    // That's a 4x4x4 cube, the roundabout way.
     stack
 }
 
 
-// It can be done faster.
+// Stacks can also be built more directly:
 fn build_cube_quickly() -> Stack<MyBlock> {
     let mut stack = Stack::new();
     stack
         // Add all blocks at once:
         .populate_with_clones(vec!{ layout![4; 4]; 4 }, &MyBlock::void())
-        // Iterate over references to modify blocks in place:
+        // Iterate over references to modify blocks in place 
+        // (will be cleaner in future editions):
         .get_all_mut()
             .into_iter()
             .enumerate()
