@@ -205,7 +205,6 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
         // to centralize existing "Stone" blocks into a pyramid shape.
         .map(|mut layer| {
             let side_length = layer.layout().len();
-
             let border_width = (base_length - side_length) / 2;
             layer
                 .pad_x(border_width)
