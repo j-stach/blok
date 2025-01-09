@@ -4,7 +4,7 @@ use blok::*;
 
 #[derive(Clone, Default)]
 struct MyBlock {
-    // A block's ID is its data.
+    // This block's ID is its only data.
     id: String
 }
 
