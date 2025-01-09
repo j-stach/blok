@@ -170,8 +170,11 @@ impl<B: Block> Stack<B> {
     use crate::types::stack::{ Stack, test::test_stack };
     
     #[test] fn add_block_test() {}
+
     #[test] fn add_block_to_layer_test() {}
+
     #[test] fn add_block_to_row_test() {}
+
     #[test] fn insert_block_test() {}
     
 }

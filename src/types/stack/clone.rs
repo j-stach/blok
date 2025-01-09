@@ -214,14 +214,44 @@ impl<B: Block> Stack<B> {
     use crate::types::layer::{ Layer, test::test_layer };
     use crate::types::stack::{ Stack, test::test_stack };
     
-    /*
-    #[test] fn clone_stack_into_blocks_test() {}
+    //#[test] fn clone_stack_into_blocks_test() {}
     
-    #[test] fn clone_stack_into_rows_test() {}
+    //#[test] fn clone_stack_into_rows_test() {}
     
-    #[test] fn clone_stack_into_layers_test() {}
+    ///
+    #[test] fn clone_stack_into_layers_test() {
 
-    #[test] fn partial_clone_test() {}
-    */
+        let mut stack = test_stack();
+        stack.new_layer();
+
+        let layers = stack.clone_into_layers();
+        stack.set_from_layers(layers);
+
+        assert_eq!(stack.layouts.len(), 4);
+        assert_eq!(stack.blocks.len(), 9);
+
+        let mut stack = Stack::<TestBlock>::new();
+
+        let layers = stack.clone_into_layers();
+        stack.set_from_layers(layers);
+
+        assert_eq!(stack.layouts.len(), 0);
+        assert_eq!(stack.blocks.len(), 0);
+
+    }
+
+    ///
+    #[test] fn layer_partial_clone_test() {
+
+        let stack = test_stack();
+        let layer = stack.clone_layer(1)
+            .expect("Second layer exists");
+
+        assert_eq!(layer.layout.total(), 3);
+        assert_eq!(layer.layout[0], 1);
+        assert_eq!(layer.layout[1], 2);
+        assert_eq!(layer.blocks.len(), 3);
+    }
+
 }
 

@@ -45,24 +45,25 @@ impl<B: Block> Stack<B> {
         &mut self, 
         instructions: &B::CreationInstructions
     ) -> &mut Self {
-        // TODO Without cloning
-        let mut layers = self.clone_into_layers();
-        for layer in layers.iter_mut() {
-            layer.fill_voids(instructions);
-        }
 
-        self.set_from_layers(layers);
+        self.blocks.iter_mut().for_each(|b| {
+            if b.is_void() {
+                *b = B::create(instructions);
+            }
+        });
+
         self
     }
 
     /// Replace all void blocks with ones cloned from a prototype.
     pub fn fill_with_clones(&mut self, block: &B) -> &mut Self {
-        let mut layers = self.clone_into_layers();
-        for layer in layers.iter_mut() {
-            layer.fill_with_clones(block);
-        }
 
-        self.set_from_layers(layers);
+        self.blocks.iter_mut().for_each(|b| {
+            if b.is_void() {
+                *b = block.clone();
+            }
+        });
+
         self
     }
 

@@ -61,7 +61,9 @@ impl<B: Block> Stack<B> {
     }
 
     #[test] fn new_stack_test() {
-        test_stack();
+        let stack = test_stack();
+        assert_eq!(stack.layouts.len(), 3);
+        assert_eq!(stack.blocks.len(), 9);
     }
 }
 

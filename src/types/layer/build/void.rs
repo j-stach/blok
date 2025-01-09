@@ -4,15 +4,25 @@ use crate::{ Block, Layer };
 /// Functions for modeling gaps and empty space:
 impl<B: Block> Layer<B> {
 
-    /// Offset a row with void blocks.
+    /// Add void blocks to the start of the row.
     pub fn offset_row(
         &mut self, 
         r: usize, 
-        offset: usize
+        mut offset: usize
     ) -> anyhow::Result<&mut Self> { 
-        
-        if r > self.layout().len() {
+
+        if r >= self.layout().len() {
             return Err(anyhow::anyhow!("Row {} could not be found", r))
+        }
+
+        if offset == 0 { 
+            return Ok(self) 
+        }
+
+        if self.layout[r] == 0 {
+            self.add_block_to_row(r, B::void())
+                .expect("Row exists because it was checked");
+            offset -= 1;
         }
 
         for _ in 0..offset {
@@ -27,30 +37,34 @@ impl<B: Block> Layer<B> {
         &mut self,
         r: usize,
         pad: usize 
-    ) -> &mut Self {
+    ) -> anyhow::Result<&mut Self> {
+
+        if r >= self.layout().len() {
+            return Err(anyhow::anyhow!("Row {} could not be found", r))
+        }
+
         for _ in 0..pad {
             self.add_block_to_row(r, B::void())
                 .expect("Each row exists");
         }
-        self
+
+        Ok(self)
     }
 
     /// Offset with an empty row.
     /// Rows contain a single void block so that they can be indexed.
     pub fn offset_x(&mut self, offset: usize) -> &mut Self {
-        let mut layout = vec![1; offset];
+
+        let mut layout = vec![0; offset];
         layout.append(self.layout_mut());
         *self.layout = layout;
-
-        let mut blocks = vec![B::void()];
-        blocks.append(&mut self.blocks);
-        self.blocks = blocks;
 
         self
     }
 
     /// Offset all rows with void blocks.
     pub fn offset_y(&mut self, offset: usize) -> &mut Self {
+
         for r in 0..self.layout().len() {
             self.offset_row(r, offset)
                 .expect("Error: Layout corrupted");
@@ -59,20 +73,21 @@ impl<B: Block> Layer<B> {
     }
 
     /// Insert empty rows at the end of the layer.
-    /// Rows contain a single void block so that they can be indexed.
     pub fn pad_x(&mut self, pad: usize) -> &mut Self {
+
         for _ in 0..pad {
             self.new_row();
-            self.add_block(B::void());
         }
         self
     }
 
     /// Add voids to the end of each row.
     pub fn pad_y(&mut self, pad: usize) -> &mut Self {
+
         let num_rows = self.layout.len();
         for r in 0..num_rows {
-            self.pad_row(r, pad);
+            self.pad_row(r, pad)
+                .expect("Row exists if using layouts");
         }
         self
     }
@@ -125,6 +140,7 @@ impl<B: Block> Layer<B> {
         &mut self, 
         instructions: &B::CreationInstructions
     ) -> &mut Self {
+
         for block in self.blocks_mut().iter_mut() {
             if block.is_void() {
                 *block = B::create(&instructions)
@@ -135,6 +151,7 @@ impl<B: Block> Layer<B> {
 
     /// Replace all void blocks with ones cloned from a prototype.
     pub fn fill_with_clones(&mut self, block: &B) -> &mut Self {
+
         for b in self.blocks_mut().iter_mut() {
             if b.is_void() {
                 *b = block.clone()
@@ -145,6 +162,7 @@ impl<B: Block> Layer<B> {
 
     /// Remove all void blocks from the matrix.
     pub fn compress(&mut self) -> &mut Self {
+
         let mut rows = self.clone_into_blocks();
         rows = rows.into_iter()
             .map(|row| 

@@ -90,11 +90,7 @@ fn build_cube() -> Stack<MyBlock> {
     ]);
 
     // Rows can be inserted into a specific index in the layer.
-    // Returns an error if the layer contains fewer rows then the value given. 
-
-    // DEBUG: THIS FAILS HERE AND IN TESTS
-    // NEEDS THE RECURSION HELPERS
-
+    // Returns an error if the layer contains fewer rows then the value given.
     base_layer.insert_row(2, row_2)
         .expect("Should insert row_2 before the previously-added row.");
 
@@ -199,7 +195,7 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
     // Map side lengths to square layouts.
     let layouts = side_lengths.into_iter().map(|len| layout![len; len]).collect();
 
-    // Create some "real" blocks for the stack using CreationInstructions instead of clones.
+    // Create some "real" blocks for the stack using &CreationInstructions instead of clones.
     stack.populate(layouts, &"Stone".to_string());
 
     // Stacks can be cloned into workable Layers...
@@ -209,6 +205,7 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
         // to centralize existing "Stone" blocks into a pyramid shape.
         .map(|mut layer| {
             let side_length = layer.layout().len();
+
             let border_width = (base_length - side_length) / 2;
             layer
                 .pad_x(border_width)
@@ -231,7 +228,7 @@ fn build_pyramid(base_length: usize) -> Stack<MyBlock> {
 }
 
 
-// TODO: fn build_sphere() -> Stack { todo!{"Algorithm to calculate sphere slices"}}
+// TODO: fn build_sphere() -> Stack { todo!{"Calculate sphere slices"}}
 
 
 
@@ -262,6 +259,7 @@ fn main() {
 
     // The layers should be squares of odd numbers:
     let stone_counts: Vec<usize> = 
+
         pyramid_scene.get_all_ref()
             .into_iter()
             .map(|layer| {
@@ -275,6 +273,7 @@ fn main() {
             })
             .collect();
 
-    assert_eq!(stone_counts, vec![7^2, 5^2, 3^2, 1]);
+    assert_eq!(stone_counts, vec![49, 25, 9, 1]);
     
+    println!("That's all, folks!");
 }

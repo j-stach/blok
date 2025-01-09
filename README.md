@@ -1,6 +1,6 @@
 
 # blok
-Traits for graphlike 3D arrays.
+Types and traits for graphlike 3D arrays.
 
 ## Usage
 See [example 1](/example/1.rs) for a basic demonstration of building with blocks. <br>
@@ -13,13 +13,15 @@ See the [docs](https://docs.rs/blok/latest/blok/) for explanations of specific t
 - Stack, Layer, Row are all generic types
 - Added partial references
 - Connections no longer rely on clone 
-- Connect methods moved to Node trait
-- Alignments can be used on rows and layers during connection 
+- Connection methods moved to a `Node` subtrait
+- Alignments can be used on rows and layers during connection, as with blocks.
+- Transformations temporarily removed
 #### For 0.0.3 
-- [ ] Removing blocks from stack/layer/row
-- [ ] Error types
+- [ ] Improved transformations
+- [ ] Methods for removing blocks 
+- [ ] Descriptive error types
 - [ ] 1-based array indexing
-- [ ] Tests improved
+- [ ] Tests and documentation improved
 - [ ] TBD...
 
 ## Notes on style

@@ -40,7 +40,7 @@ impl<B: Block> Stack<B> {
         let layouts = self.layouts();
 
         // If the layer cannot be indexed, it is an error.
-        if l > layouts.len() {
+        if layouts.len() <= l {
             return Err(anyhow::anyhow!("The stack can not be indexed at layer {}", l))
         }
 
@@ -93,8 +93,7 @@ impl<B: Block> Stack<B> {
         if let Some((start, end)) = self.find_layer_bounds(l).ok()? {
 
             // Get the corresponding blocks and layout.
-            let blocks = self.get_range_ref(start, end)
-                .expect("Layer contains blocks");
+            let blocks = self.get_range_ref(start, end)?;
             let layout = self.layouts.get(l)
                 .expect("Layout exists");
         
@@ -127,8 +126,7 @@ impl<B: Block> Stack<B> {
                 .expect("Layout exists")
                 .clone();
             // Get the corresponding blocks and layout.
-            let blocks = self.get_range_mut(start, end)
-                .expect("Layer contains blocks");
+            let blocks = self.get_range_mut(start, end)?;
         
             // Use the layout to organize blocks to reflect the layer structure.
             let rows = layer_ref_organization_helper::<&mut B>(&layout, blocks);
@@ -161,3 +159,61 @@ fn layer_ref_organization_helper<T>(layout: &Layout, mut blocks: Vec<T>) -> Vec<
     rows
 }
 
+
+
+/*  UNIT TESTS  */
+#[cfg(test)] mod test {
+    use crate::block::{ Block, test::TestBlock };
+    use crate::types::layer::{ Layer, test::test_layer };
+    use crate::types::stack::{ Stack, test::test_stack };
+
+    ///
+    #[test] fn find_layer_bounds_test() {
+
+        let mut stack = test_stack();
+
+        assert_eq!(
+            stack.find_layer_bounds(0)
+                .expect("Layer exists") 
+                .expect("Layer has blocks"), 
+            (0,2)
+        );
+        assert_eq!(
+            stack.find_layer_bounds(1)
+                .expect("Layer exists") 
+                .expect("Layer has blocks"), 
+            (3,5)
+        );
+        assert_eq!(
+            stack.find_layer_bounds(2)
+                .expect("Layer exists") 
+                .expect("Layer has blocks"), 
+            (6,8)
+        );
+
+        stack.new_layer();
+
+        assert_eq!(
+            stack.find_layer_bounds(3)
+                .expect("Layer exists"),
+            None
+        );
+
+    }
+
+    ///
+    #[test] fn get_layer_test() {
+
+        let mut stack = test_stack();
+        stack.new_layer();
+
+        assert!(stack.get_layer_ref(0).is_some());
+        assert!(stack.get_layer_ref(1).is_some());
+        assert!(stack.get_layer_ref(2).is_some());
+        assert!(stack.get_layer_ref(3).is_some());
+
+        assert!(stack.get_layer_ref(4).is_none());
+        //
+    }
+
+} 

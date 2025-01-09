@@ -11,7 +11,7 @@
 - [x] NodeBlock subtrait for connections
 - [x] Tests and examples refactored, doc tests in comments
 - [ ] Tests and examples debugged
-- [ ] previously_available_recursion_helper functions for Layer
+- [x] previously_available_recursion_helper functions for Layer
 - [x] update TODO for next version
 - [ ] publish update to crates.io
 
@@ -44,9 +44,6 @@
 - [ ] `disconnect` method for Block trait to allow `remove`
 - [ ] Hide "connect", "clone", and other behavior behind feats
 - [ ] CreationInstruction factories
-
-## types
-- [x] Convert connect to reference version
 
 ### row 
 - [x] Integration with higher types
