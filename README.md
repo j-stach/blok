@@ -19,6 +19,7 @@ See the [docs](https://docs.rs/blok/latest/blok/) for explanations of specific t
 #### For 0.0.3 
 - [ ] Improved transformations
 - [ ] Methods for removing blocks 
+- [ ] Connection and disconnection fleshed out
 - [ ] Descriptive error types
 - [ ] 1-based array indexing
 - [ ] Tests and documentation improved

@@ -12,6 +12,7 @@ pub fn row_connection<'c, N: Node>(
     block_align: Aligner<&'c mut N>, 
     mut instructions: Vec<N::ConnectionInstructions>
 ) {
+
     let alignment = block_align(row1, row2);
 
     let last_instr = if let Some(instr) = instructions.last() {
@@ -20,13 +21,13 @@ pub fn row_connection<'c, N: Node>(
         N::ConnectionInstructions::default()
     };
 
-    while alignment.len() < instructions.len() {
+    while alignment.len() > instructions.len() {
         instructions.push(last_instr.clone())
     }
 
     let mut step = 0usize;
     for pair in alignment.iter() {
-        if row1.len() < pair.0 && row2.len() < pair.1 {
+        if row1.len() > pair.0 && row2.len() > pair.1 {
             let block1 = &mut row1[pair.0];
             let block2 = &mut row2[pair.1];
             block1.connect(block2, &instructions[step])
@@ -72,13 +73,13 @@ pub fn layer_connection<'c, N: Node>(
         vec![N::ConnectionInstructions::default()]
     };
 
-    while alignment.len() < instructions.len() {
+    while alignment.len() > instructions.len() {
         instructions.push(last_instr.clone())
     }
 
     let mut step = 0usize;
     for pair in alignment.iter() {
-        if layer1.len() < pair.0 && layer2.len() < pair.1 {
+        if layer1.len() > pair.0 && layer2.len() > pair.1 {
             let row1 = &mut layer1[pair.0];
             let row2 = &mut layer2[pair.1];
             row_connection(row1, row2, block_align, instructions[step].clone());
@@ -133,13 +134,13 @@ pub fn stack_connection<'c, N: Node>(
         vec![vec![N::ConnectionInstructions::default()]]
     };
 
-    while alignment.len() < instructions.len() {
+    while alignment.len() > instructions.len() {
         instructions.push(last_instr.clone())
     }
 
     let mut step = 0usize;
     for pair in alignment.iter() {
-        if stack1.len() < pair.0 && stack2.len() < pair.1 {
+        if stack1.len() > pair.0 && stack2.len() > pair.1 {
             let layer1 = &mut stack1[pair.0];
             let layer2 = &mut stack2[pair.1];
             layer_connection(layer1, layer2, row_align, block_align, instructions[step].clone());

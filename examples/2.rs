@@ -115,6 +115,8 @@ pub fn main() {
 
     //let mut cube3 = build_cube();
     // TODO: connect rows and layers within stack 
+
+    println!("That's all folks!");
 }
 
 
