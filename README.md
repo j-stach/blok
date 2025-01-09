@@ -3,9 +3,9 @@
 Types and traits for graphlike 3D arrays.
 
 ## Usage
-See [example 1](/example/1.rs) for a basic demonstration of building with blocks. <br>
-See [example 2](/example/2.rs) for a demonstration of procedural node connection. <br>
-See the [docs](https://docs.rs/blok/latest/blok/) for explanations of specific types and methods.
+See [example 1](/examples/1.rs) for a basic demonstration of building with blocks. <br>
+See [example 2](/examples/2.rs) for a demonstration of procedural node connection. <br>
+See the [crate documentation](https://docs.rs/blok/latest/blok/) for explanations of specific types and methods.
 
 ## Development
 **Blok is a work-in-progress.** Current tasks can be tracked in [TODO.md](/TODO.md). <br>
