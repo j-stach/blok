@@ -14,7 +14,7 @@ See the [crate documentation](https://docs.rs/blok/latest/blok/) for explanation
 - Added partial references
 - Connections no longer rely on clone 
 - Connection methods moved to a `Node` subtrait
-- Alignments can be used on rows and layers during connection, as with blocks.
+- Alignments can be used on rows and layers during connection, as with blocks
 - Transformations temporarily removed
 #### For 0.0.3 
 - [ ] Improved transformations
@@ -34,15 +34,15 @@ of the corresponding element within a stack.
 2. Methods that "find" a block index using layouts will fail with an error.
 Methods that "get" references to blocks will treat that error as None,
 representing the failure to find the block as an absence.
-3. When building structures, blocks cannot be "inserted" at the last position of an element,
+3. When building structures, blocks cannot be "inserted" at the last position of a row or layer,
 or in any other situation where the future location cannot be indexed as an existing block.
 In such a scenario, you must use a method that "adds" it to the structure, instead.
 Conventions like this exist for ease-of-development through the early stages
-and will likely be corrected for improved ease-of-use as the crate is refined.
+and will be changed later on.
 4. The build process is designed to be similar at each level of construction,
 so if you are expecting to use a method that would correspond to another 
 that exists for a different scale, but finding that it does not exist,
 then it is probable that the method or function has not been implemented yet.
 These corresponding methods will be fleshed out as the crate is refined, 
-so that the build process is intuitively similar for each of the types.
+so that the build process will be intuitively similar for each of the types.
 
