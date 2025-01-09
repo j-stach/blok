@@ -19,7 +19,7 @@
 
 ----
 
-## examples
+## types
 - [ ] Transformations 
 
 ----
