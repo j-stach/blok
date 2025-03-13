@@ -11,7 +11,7 @@ See the [crate documentation](https://docs.rs/blok/latest/blok/) for explanation
 **Blok is a work-in-progress.** Current tasks can be tracked in [TODO.md](/TODO.md). <br>
 #### In 0.0.21
 - `map` blocks to new block types while preserving layouts 
-    (e.g. `Stack<A: Block>` to `Stack<B: Block>`),
+    (e.g. `Stack<A: Block>` to `Stack<B: Block>`)
 #### For 0.0.30
 - [ ] Improved transformations
 - [ ] Methods for removing blocks 
