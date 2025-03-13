@@ -1,5 +1,5 @@
 
-# blok 0.0.3 TODO:
+# blok 0.0.30 TODO:
 
 ----
 
@@ -17,6 +17,7 @@
 
 ## types
 - [ ] Transformations 
+- [ ] For each (supply functions that use `l`, `r`, `b` to do something with the block)
 
 ----
 

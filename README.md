@@ -1,6 +1,6 @@
 
 # blok
-Types and traits for graphlike 3D arrays.
+Types and traits for graphlike 3D arrays, designed for visual thinkers.
 
 ## Usage
 See [example 1](/examples/1.rs) for a basic demonstration of building with blocks. <br>
@@ -9,14 +9,10 @@ See the [crate documentation](https://docs.rs/blok/latest/blok/) for explanation
 
 ## Development
 **Blok is a work-in-progress.** Current tasks can be tracked in [TODO.md](/TODO.md). <br>
-#### In 0.0.2 
-- Stack, Layer, Row are all generic types
-- Added partial references
-- Connections no longer rely on clone 
-- Connection methods moved to a `Node` subtrait
-- Alignments can be used on rows and layers during connection, as with blocks
-- Transformations temporarily removed
-#### For 0.0.3 
+#### In 0.0.21
+- `map` blocks to new block types while preserving layouts 
+    (e.g. `Stack<A: Block>` to `Stack<B: Block>`),
+#### For 0.0.30
 - [ ] Improved transformations
 - [ ] Methods for removing blocks 
 - [ ] Connection and disconnection fleshed out
