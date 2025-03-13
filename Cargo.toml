@@ -1,7 +1,7 @@
 
 [package]
 name = "blok"
-description = "3D arrays that matter"
+description = "Types and traits for graphlike 3D arrays, designed for visual thinkers."
 authors = ["j-stach"]
 version = "0.0.21"
 edition = "2021"
