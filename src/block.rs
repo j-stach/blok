@@ -42,6 +42,11 @@ pub trait Block: Clone + Default {
         }
     }
 
+    /// Create a new Block of a different type using the data from this block.
+    fn map<C: Block, T: Fn(&Self) -> C>(&self, t: T) -> C {
+        t(self)
+    }
+
     // TBD Expand provided functions 
 
 }

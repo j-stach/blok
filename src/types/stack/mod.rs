@@ -47,6 +47,23 @@ impl<B: Block> Stack<B> {
 
 }
 
+/// Utility functions:
+impl<B: Block> Stack<B> {
+
+    /// Create a new Layer of a different type of blocks using the rows from this layer.
+    pub fn map<C: Block, T: Fn(&B) -> C>(&self, t: T) -> Stack<C> {
+        let mapped_blocks: Vec<C> = self.blocks()
+            .iter()
+            .map(t)
+            .collect();
+
+        let mut mapped_stack = Stack::<C>::new();
+        mapped_stack.blocks = mapped_blocks;
+        mapped_stack.layouts = self.layouts.clone();
+
+        mapped_stack
+    }
+}
 
 
 #[cfg(test)] mod test {

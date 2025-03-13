@@ -33,4 +33,15 @@ impl<B: Block> Row<B> {
         &self.blocks
     }
 
+    /// Create a new Row of a different type of blocks using the blocks from this row.
+    pub fn map<C: Block, T: Fn(&B) -> C>(&self, t: T) -> Row<C> {
+        let mapped_blocks = self.blocks()
+            .iter()
+            .map(t)
+            .collect();
+
+        Row::wrap(mapped_blocks)
+    }
+
+
 }

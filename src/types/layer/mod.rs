@@ -62,6 +62,20 @@ impl<B: Block> Layer<B> {
         Ok(())
     }
     
+    /// Create a new Layer of a different type of blocks using the rows from this layer.
+    pub fn map<C: Block, T: Fn(&B) -> C>(&self, t: T) -> Layer<C> {
+        let mapped_blocks: Vec<C> = self.blocks()
+            .iter()
+            .map(t)
+            .collect();
+
+        let mut mapped_layer = Layer::<C>::new();
+        mapped_layer.layout = self.layout.clone();
+        mapped_layer.blocks = mapped_blocks;
+
+        mapped_layer
+    }
+
 }
 
 
