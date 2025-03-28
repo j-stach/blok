@@ -4,6 +4,7 @@ use crate::{ Block, Layout };
 
 /// Meta-implementation for nested Stack types.
 impl<B: Block> Block for Stack<B> {
+
     type CreationInstructions = Vec<Layout>;
 
     fn create(layouts: &Vec<Layout>) -> Self {
@@ -19,4 +20,5 @@ impl<B: Block> Block for Stack<B> {
     fn is_void(&self) -> bool { self.blocks().is_empty() }
 
 }
+
 

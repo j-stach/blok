@@ -7,10 +7,14 @@ pub mod meta;
 
 use crate::{ Block, Layer, Layout };
 
+use serde::{ Serialize, Deserialize, de::DeserializeOwned };
 
 /// Holds a 3D matrix of blocks in a single vector,
 /// with layer/row indexing stored in a vector of layouts.
-#[derive(Debug, Default, Clone)]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
+#[serde(bound(
+        serialize = "B: Block + Serialize", 
+        deserialize = "B: Block + DeserializeOwned"))]
 pub struct Stack<B: Block> {
     /// Represents the organization of blocks in the array.
     layouts: Vec<Layout>,

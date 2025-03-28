@@ -3,7 +3,7 @@
 name = "blok"
 description = "Types and traits for graphlike 3D arrays, designed for visual thinkers."
 authors = ["j-stach"]
-version = "0.0.22"
+version = "0.0.23"
 edition = "2021"
 repository = "https://github.com/j-stach/blok"
 license = "MIT OR Apache-2.0"
