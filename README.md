@@ -9,8 +9,9 @@ See the [crate documentation](https://docs.rs/blok/latest/blok/) for explanation
 
 ## Development
 **Blok is a work-in-progress.** Current tasks can be tracked in [TODO.md](/TODO.md). <br>
-#### In 0.0.21
+#### In 0.0.2x
 - `map` blocks to new block types (e.g. `Stack<A: Block>` to `Stack<B: Block>`)
+- Implements `Block` for `u8` and other primitives
 #### For 0.0.30
 - [ ] Improved transformations
 - [ ] Methods for removing blocks 
