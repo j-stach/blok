@@ -2,7 +2,8 @@
 pub mod build;
 pub mod partial;
 pub mod clone;
-//pub mod connect;
+pub mod meta;
+
 
 use crate::{ Block, Layer, Layout };
 
