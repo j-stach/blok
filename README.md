@@ -13,6 +13,7 @@ See the [crate documentation](https://docs.rs/blok/latest/blok/) for explanation
 - `map` blocks to new block types (e.g. `Stack<A: Block>` to `Stack<B: Block>`)
 - Implements `Block` for `u8` and other primitives
 - `Stack<B: Block + Serialize + DeserializeOwned>` (serde-deriving blocks) can now be serialized/deserialized
+- `realize_volume` to square-off stacks
 #### For 0.0.30
 - [ ] Improved transformations
 - [ ] Methods for removing blocks 
