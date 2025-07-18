@@ -55,7 +55,7 @@ impl<B: Block> Stack<B> {
 /// Utility functions:
 impl<B: Block> Stack<B> {
 
-    /// Create a new Layer of a different type of blocks using the rows from this layer.
+    /// Create a new Stack for a different type of blocks using the layouts from this stack.
     pub fn map<C: Block, T: Fn(&B) -> C>(&self, t: T) -> Stack<C> {
         let mapped_blocks: Vec<C> = self.blocks()
             .iter()
